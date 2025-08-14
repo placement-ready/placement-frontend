@@ -2,12 +2,13 @@
 
 import React from "react";
 import Image from "next/image";
+import "../styles/hero.css";
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative min-h-screen w-full flex flex-col justify-between bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 pt-8 md:pt-16">
+    <section className="relative min-h-screen w-full flex flex-col justify-between bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 pt-22 md:pt-24">
       {/* Centered main content */}
-      <div className="flex-1 flex flex-col justify-center items-center text-center px-4 sm:px-6">
+      <div className="flex-1 flex flex-col justify-center items-center text-center px-2 sm:px-4">
         {/* Logo / Icon */}
         <div className="mx-auto rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-lg bg-gradient-to-tr from-emerald-500 to-green-400">
           <Image
@@ -21,18 +22,16 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900 mb-5 max-w-3xl">
-          Ace Your Interviews with{" "}
+        <h1 className="text-4xl sm:text-6xl lg:text-5xl font-bold leading-tight text-gray-900 mb-2 max-w-3xl">
+          From nervous to natural{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
-            AI-Powered Coaching
+            — transform your interview skills.
           </span>
         </h1>
 
         {/* Subhead */}
-        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl">
-          <span className="font-semibold">Real-time AI feedback</span>, facial
-          expression analysis, and curated practice plans to help you land your
-          dream job. Prepare smarter, not harder.
+        <p className="text-lg sm:text-xl text-gray-600 mb-15 max-w-1xl">
+          Instant SkilledAI feedback and personalized practice plans to help you ace your interviews!!
         </p>
 
         {/* CTAs */}
@@ -46,8 +45,8 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Trust / tagline */}
-        <div className="bg-green-100 border border-green-200 rounded-md py-2 px-4 sm:px-6 text-sm sm:text-base text-green-700 font-medium">
-          "Your secret weapon for interview success"
+        <div className="bg-green-100 border border-green-200 rounded-md py-2 px-4 sm:px-6 text-sm sm:text-base text-green-700 font-medium typewriter">
+          "Master Your Interviews with HireMind’s Expert Insights."
         </div>
       </div>
 
