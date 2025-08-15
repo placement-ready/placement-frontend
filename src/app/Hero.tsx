@@ -34,15 +34,15 @@ const Hero: React.FC = () => {
           Instant SkilledAI feedback and personalized practice plans to help you ace your interviews!!
         </p>
 
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 w-full sm:w-auto">
-          <button className="bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition w-full sm:w-auto">
-            Start Practicing
-          </button>
-          <button className="border border-gray-300 font-semibold py-3 px-8 rounded-lg bg-white hover:bg-gray-50 w-full sm:w-auto">
-            View Study Plans
-          </button>
-        </div>
+				{/* CTAs */}
+				<div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 w-full sm:w-auto">
+					<button className="bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition w-full sm:w-auto">
+						Start Practicing
+					</button>
+					<button className="border border-gray-300 font-semibold py-3 px-8 rounded-lg bg-white hover:bg-gray-50 w-full sm:w-auto">
+						View Study Plans
+					</button>
+				</div>
 
         {/* Trust / tagline */}
         <div className="bg-green-100 border border-green-200 rounded-md py-2 px-4 sm:px-6 text-sm sm:text-base text-green-700 font-medium typewriter">
@@ -50,25 +50,25 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats section */}
-      <div className="w-full bg-white/60 backdrop-blur-sm py-8">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 px-6">
-          <StatCard value="500+" label="Practice Questions" />
-          <StatCard value="3" label="AI Models" />
-          <StatCard value="50+" label="Companies" />
-          <StatCard value="8" label="Study Plans" />
-        </div>
-      </div>
-    </section>
-  );
+			{/* Stats section */}
+			<div className="w-full bg-white/60 backdrop-blur-sm py-8">
+				<div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 px-6">
+					<StatCard value="500+" label="Practice Questions" />
+					<StatCard value="3" label="AI Models" />
+					<StatCard value="50+" label="Companies" />
+					<StatCard value="8" label="Study Plans" />
+				</div>
+			</div>
+		</section>
+	);
 };
 
 // Small stat card component for reusability
 const StatCard = ({ value, label }: { value: string; label: string }) => (
-  <div className="bg-white rounded-xl shadow-sm p-5 flex flex-col items-center">
-    <div className="text-green-600 font-bold text-2xl mb-1">{value}</div>
-    <div className="text-gray-700 text-sm text-center">{label}</div>
-  </div>
+	<div className="bg-white rounded-xl shadow-sm p-5 flex flex-col items-center">
+		<div className="text-green-600 font-bold text-2xl mb-1">{value}</div>
+		<div className="text-gray-700 text-sm text-center">{label}</div>
+	</div>
 );
 
 export default Hero;
