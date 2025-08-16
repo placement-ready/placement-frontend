@@ -3,10 +3,13 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Login: React.FC = () => {
 	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+	const [showPasswordField, setShowPasswordField] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [emailSent, setEmailSent] = useState(false);
 
@@ -14,8 +17,19 @@ const Login: React.FC = () => {
 		e.preventDefault();
 		if (!email) return;
 
+		// If password field is not shown yet, show it first
+		if (!showPasswordField) {
+			setShowPasswordField(true);
+			return;
+		}
+
+		// If password field is shown but no password entered, require it
+		if (!password) return;
+
 		setIsLoading(true);
 		try {
+			// For now, we'll use the resend provider for passwordless login
+			// You can replace this with your actual password authentication
 			const result = await signIn("resend", {
 				email,
 				redirect: false,
@@ -62,6 +76,8 @@ const Login: React.FC = () => {
 						onClick={() => {
 							setEmailSent(false);
 							setEmail("");
+							setPassword("");
+							setShowPasswordField(false);
 						}}
 						className="text-green-600 hover:text-green-700 font-medium transition-colors duration-200 cursor-pointer"
 					>
@@ -84,11 +100,114 @@ const Login: React.FC = () => {
 					<p className="text-gray-600 text-sm sm:text-base">Sign in to your account to continue</p>
 				</div>
 
+				{/* Email Form */}
+				<form onSubmit={handleEmailSignIn} className="space-y-4 mb-6">
+					<div>
+						<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+							Email address
+						</label>
+						<div className="relative">
+							<input
+								id="email"
+								type="email"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								placeholder="Enter your email"
+								required
+								disabled={isLoading}
+								className="w-full pl-10 pr-4 py-3 sm:py-4 border-2 text-black border-gray-200 rounded-xl focus:border-green-400 focus:ring-0 focus:outline-none bg-gray-50 hover:bg-white hover:border-green-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+							/>
+							<EnvelopeIcon className="w-5 h-5 text-gray-600 absolute left-3 top-1/2 transform -translate-y-1/2" />
+						</div>
+					</div>
+
+					{/* Password Field - Only shown after clicking Continue with Email */}
+					{showPasswordField && (
+						<div>
+							<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+								Password
+							</label>
+							<div className="relative">
+								<input
+									id="password"
+									type={showPassword ? "text" : "password"}
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									placeholder="Enter your password"
+									required
+									disabled={isLoading}
+									className="w-full pl-10 pr-12 py-3 sm:py-4 border-2 text-black border-gray-200 rounded-xl focus:border-green-400 focus:ring-0 focus:outline-none bg-gray-50 hover:bg-white hover:border-green-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+								/>
+								<svg
+									className="w-5 h-5 text-gray-600 absolute left-3 top-1/2 transform -translate-y-1/2"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+									/>
+								</svg>
+								<button
+									type="button"
+									onClick={() => setShowPassword(!showPassword)}
+									className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+								>
+									{showPassword ? (
+										<EyeIcon className="w-5 h-5" />
+									) : (
+										<EyeSlashIcon className="w-5 h-5" />
+									)}
+								</button>
+							</div>
+							{/* Forgot Password Link */}
+							<div className="mt-2 text-right">
+								<a
+									href="#"
+									className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors duration-200"
+								>
+									Forgot password?
+								</a>
+							</div>
+						</div>
+					)}
+
+					<button
+						type="submit"
+						disabled={isLoading || !email || (showPasswordField && !password)}
+						className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transform hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base cursor-pointer"
+					>
+						{isLoading ? (
+							<div className="flex items-center justify-center gap-2">
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+								{showPasswordField ? "Signing in..." : "Sending magic link..."}
+							</div>
+						) : showPasswordField ? (
+							"Sign in"
+						) : (
+							"Continue with Email"
+						)}
+					</button>
+				</form>
+
+				{/* Divider */}
+				<div className="relative mb-6">
+					<div className="absolute inset-0 flex items-center">
+						<div className="w-full border-t border-gray-200"></div>
+					</div>
+					<div className="relative flex justify-center text-sm">
+						<span className="px-4 bg-white text-gray-500">or</span>
+					</div>
+				</div>
+
 				{/* Google Sign In */}
 				<button
 					onClick={handleGoogleSignIn}
 					disabled={isLoading}
-					className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 rounded-xl p-3 sm:p-4 font-medium text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-md transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mb-6 cursor-pointer"
+					className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 rounded-xl p-3 sm:p-4 font-medium text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-md transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
 				>
 					<svg
 						width="20"
@@ -116,53 +235,6 @@ const Login: React.FC = () => {
 					</svg>
 					{isLoading ? "Signing in..." : "Continue with Google"}
 				</button>
-
-				{/* Divider */}
-				<div className="relative mb-6">
-					<div className="absolute inset-0 flex items-center">
-						<div className="w-full border-t border-gray-200"></div>
-					</div>
-					<div className="relative flex justify-center text-sm">
-						<span className="px-4 bg-white text-gray-500">or</span>
-					</div>
-				</div>
-
-				{/* Email Form */}
-				<form onSubmit={handleEmailSignIn} className="space-y-4">
-					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-							Email address
-						</label>
-						<div className="relative">
-							<input
-								id="email"
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								placeholder="Enter your email"
-								required
-								disabled={isLoading}
-								className="w-full pl-10 pr-4 py-3 sm:py-4 border-2 text-black border-gray-200 rounded-xl focus:border-green-400 focus:ring-0 focus:outline-none bg-gray-50 hover:bg-white hover:border-green-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-							/>
-							<EnvelopeIcon className="w-5 h-5 text-gray-600 absolute left-3 top-1/2 transform -translate-y-1/2" />
-						</div>
-					</div>
-
-					<button
-						type="submit"
-						disabled={isLoading || !email}
-						className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transform hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base cursor-pointer"
-					>
-						{isLoading ? (
-							<div className="flex items-center justify-center gap-2">
-								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-								Sending magic link...
-							</div>
-						) : (
-							"Continue with Email"
-						)}
-					</button>
-				</form>
 
 				{/* Footer */}
 				<div className="mt-8 text-center">
