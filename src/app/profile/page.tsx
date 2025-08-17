@@ -22,8 +22,11 @@ import {
 	HeartIcon,
 	EyeIcon,
 	ShareIcon,
+	ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as CheckCircleIconSolid } from "@heroicons/react/24/solid";
+import { useAuth } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 // Types for profile data
 interface Education {
@@ -73,19 +76,34 @@ const Profile: React.FC = () => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 
+	// Get authenticated user data
+	const { user, logout } = useAuth();
+
+	// Helper function to get user avatar from different user object types
+	const getUserAvatar = (userObj: typeof user) => {
+		if (!userObj) return "/brain.png";
+		// Handle both NextAuth user (image) and API user (avatar) types
+		return (
+			(userObj as { avatar?: string; image?: string }).avatar ||
+			(userObj as { avatar?: string; image?: string }).image ||
+			"/brain.png"
+		);
+	};
+
 	// Animation trigger
 	useEffect(() => {
 		setIsVisible(true);
 	}, []);
 
 	// Mock data - in real app, this would come from API/database
+	// For now, we'll merge real user data with mock profile data
 	const profileData = {
 		personalInfo: {
-			name: "Alex Johnson",
-			email: "alex.johnson@email.com",
+			name: user?.name || "User Name",
+			email: user?.email || "user@example.com",
 			phone: "+1 (555) 123-4567",
 			location: "San Francisco, CA",
-			avatar: "/brain.png", // Using existing logo as placeholder
+			avatar: getUserAvatar(user), // Handle both NextAuth and API user types
 			title: "Computer Science Student",
 			bio: "Passionate software developer with expertise in full-stack development. Seeking opportunities in tech companies to contribute to innovative projects and grow professionally.",
 			graduation: "May 2024",
@@ -583,6 +601,18 @@ const Profile: React.FC = () => {
 							>
 								<PencilIcon className="w-5 h-5" />
 							</button>
+							<button
+								onClick={() => logout.mutate()}
+								disabled={logout.isLoading}
+								className="bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-xl hover:bg-red-600/80 transition-all duration-300 transform hover:scale-110 disabled:opacity-50"
+								title="Logout"
+							>
+								{logout.isLoading ? (
+									<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+								) : (
+									<ArrowRightOnRectangleIcon className="w-5 h-5" />
+								)}
+							</button>
 						</div>
 					</div>
 
@@ -701,4 +731,13 @@ const Profile: React.FC = () => {
 	);
 };
 
-export default Profile;
+// Wrap the Profile component with authentication protection
+const ProtectedProfile: React.FC = () => {
+	return (
+		<ProtectedRoute>
+			<Profile />
+		</ProtectedRoute>
+	);
+};
+
+export default ProtectedProfile;

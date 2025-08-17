@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useLogin } from "@/lib/queries/auth";
 
 const LoginPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -14,6 +16,9 @@ const LoginPassword: React.FC = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+
+	// React Query mutation for login
+	const loginMutation = useLogin();
 
 	// Initialize email from localStorage
 	useEffect(() => {
@@ -29,23 +34,39 @@ const LoginPassword: React.FC = () => {
 
 	const handlePasswordSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!password) return;
+		if (!password || !email) return;
 
 		setIsLoading(true);
 		setError("");
 
 		try {
-			// TODO: Implement actual login API call
-			console.log("Logging in user:", { email, password });
+			// Use React Query mutation for login
+			const result = await loginMutation.mutateAsync({
+				email,
+				password,
+			});
 
-			// Mock successful login
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			// Check if login was successful
+			if (result.data.user) {
+				// Try to sign in with NextAuth using credentials
+				const signInResult = await signIn("credentials", {
+					email,
+					password,
+					redirect: false,
+				});
 
-			// Redirect to dashboard or home page
-			router.push("/profile");
-		} catch (error) {
+				if (signInResult?.ok) {
+					// Successful login, redirect to profile
+					router.push("/profile");
+				} else {
+					setError("Login failed. Please try again.");
+				}
+			}
+		} catch (error: unknown) {
 			console.error("Login error:", error);
-			setError("Invalid password. Please try again.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Invalid password. Please try again.";
+			setError(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -69,7 +90,7 @@ const LoginPassword: React.FC = () => {
 			password={password}
 			setPassword={setPassword}
 			onSubmit={handlePasswordSubmit}
-			isLoading={isLoading}
+			isLoading={isLoading || loginMutation.isPending}
 			error={error}
 			showPassword={showPassword}
 			setShowPassword={setShowPassword}

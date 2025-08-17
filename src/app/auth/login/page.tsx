@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import AuthForm from "@/components/auth/AuthForm";
-import { useAuthState, checkUserExists } from "@/hooks/useAuthState";
+import { useAuthState } from "@/hooks/useAuthState";
+import { useCheckUserExists } from "@/lib/queries/auth";
 
 const Login: React.FC = () => {
 	const [localEmail, setLocalEmail] = useState("");
@@ -13,6 +14,9 @@ const Login: React.FC = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, setEmail, isLoading: authLoading } = useAuthState();
+
+	// React Query hook for checking user existence
+	const { refetch: checkUser, isLoading: isCheckingUser } = useCheckUserExists(localEmail, false); // disabled by default
 
 	// Initialize email from localStorage
 	useEffect(() => {
@@ -32,7 +36,9 @@ const Login: React.FC = () => {
 			// Store email in localStorage
 			setEmail(localEmail);
 
-			const userExists = await checkUserExists(localEmail);
+			// Use React Query to check if user exists
+			const result = await checkUser();
+			const userExists = result.data?.data?.exists || false;
 
 			if (userExists) {
 				// User exists, proceed to password step
@@ -67,7 +73,7 @@ const Login: React.FC = () => {
 			email={localEmail}
 			setEmail={setLocalEmail}
 			onSubmit={handleEmailSubmit}
-			isLoading={isLoading}
+			isLoading={isLoading || isCheckingUser}
 			error={error}
 			buttonText="Continue"
 			loadingText="Checking..."

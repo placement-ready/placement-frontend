@@ -5,6 +5,7 @@ import Image from "next/image";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useVerifyEmail, useResendVerification } from "@/lib/queries/auth";
 
 const EmailVerification = () => {
 	const [verificationCode, setVerificationCode] = useState("");
@@ -14,6 +15,10 @@ const EmailVerification = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+
+	// React Query mutations
+	const verifyEmailMutation = useVerifyEmail();
+	const resendVerificationMutation = useResendVerification();
 
 	// Initialize email from localStorage
 	useEffect(() => {
@@ -35,18 +40,22 @@ const EmailVerification = () => {
 		setError("");
 
 		try {
-			// TODO: Implement verification code validation
-			// This function will be built later
-			console.log("Verifying code:", verificationCode, "for email:", email);
+			// Use React Query mutation for email verification
+			const result = await verifyEmailMutation.mutateAsync({
+				email,
+				code: verificationCode,
+			});
 
-			// Mock successful verification
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-
-			// Redirect to profile/dashboard after successful verification
-			router.push("/profile");
-		} catch (error) {
+			// Check if verification was successful
+			if (result.data.success) {
+				// Redirect to profile/dashboard after successful verification
+				router.push("/profile");
+			}
+		} catch (error: unknown) {
 			console.error("Error verifying code:", error);
-			setError("Invalid verification code. Please try again.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Invalid verification code. Please try again.";
+			setError(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -56,12 +65,15 @@ const EmailVerification = () => {
 		if (!email) return;
 
 		try {
-			// TODO: Implement resend email functionality
-			console.log("Resending verification email to:", email);
-			// await resendVerificationEmail(email);
-		} catch (error) {
+			// Use React Query mutation for resending verification email
+			await resendVerificationMutation.mutateAsync(email);
+			// Show success message (you might want to add a success state)
+			console.log("Verification email resent successfully");
+		} catch (error: unknown) {
 			console.error("Error resending email:", error);
-			setError("Failed to resend email. Please try again.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to resend email. Please try again.";
+			setError(errorMessage);
 		}
 	};
 
@@ -122,10 +134,10 @@ const EmailVerification = () => {
 					</div>
 					<button
 						type="submit"
-						disabled={isLoading || !verificationCode}
+						disabled={isLoading || verifyEmailMutation.isPending || !verificationCode}
 						className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transform hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base cursor-pointer"
 					>
-						{isLoading ? (
+						{isLoading || verifyEmailMutation.isPending ? (
 							<div className="flex items-center justify-center gap-2">
 								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
 								{"Verifying..."}
@@ -142,9 +154,10 @@ const EmailVerification = () => {
 						Didn&apos;t receive the email?{" "}
 						<button
 							onClick={handleResendEmail}
-							className="text-green-600 hover:text-green-700 font-medium transition-colors duration-200 underline bg-transparent border-none cursor-pointer"
+							disabled={resendVerificationMutation.isPending}
+							className="text-green-600 hover:text-green-700 font-medium transition-colors duration-200 underline bg-transparent border-none cursor-pointer disabled:opacity-50"
 						>
-							Resend Email
+							{resendVerificationMutation.isPending ? "Sending..." : "Resend Email"}
 						</button>
 					</p>
 				</div>

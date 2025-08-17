@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useRegister } from "@/lib/queries/auth";
 
 const CreateAccountPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -16,6 +17,9 @@ const CreateAccountPassword: React.FC = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+
+	// React Query mutation for registration
+	const registerMutation = useRegister();
 
 	// Initialize email from localStorage
 	useEffect(() => {
@@ -66,17 +70,23 @@ const CreateAccountPassword: React.FC = () => {
 		setError("");
 
 		try {
-			// TODO: Implement actual account creation API call
-			console.log("Creating account:", { email, password });
+			// Use React Query mutation for registration
+			const result = await registerMutation.mutateAsync({
+				email,
+				password,
+				name: email.split("@")[0], // Use email prefix as default name
+			});
 
-			// Mock account creation
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-
-			// Redirect to email verification
-			router.push("/auth/email-verification");
-		} catch (error) {
+			// Check if registration was successful
+			if (result.data.user) {
+				// Redirect to email verification
+				router.push("/auth/email-verification");
+			}
+		} catch (error: unknown) {
 			console.error("Account creation error:", error);
-			setError("Failed to create account. Please try again.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to create account. Please try again.";
+			setError(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -102,7 +112,7 @@ const CreateAccountPassword: React.FC = () => {
 			confirmPassword={confirmPassword}
 			setConfirmPassword={setConfirmPassword}
 			onSubmit={handlePasswordSubmit}
-			isLoading={isLoading}
+			isLoading={isLoading || registerMutation.isPending}
 			error={error}
 			showPassword={showPassword}
 			setShowPassword={setShowPassword}

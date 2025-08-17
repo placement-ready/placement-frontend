@@ -47,14 +47,3 @@ export const useAuthState = () => {
 		getStoredEmail,
 	};
 };
-
-// Mock function for checking user existence (can be moved to a separate service file)
-export const checkUserExists = async (email: string): Promise<boolean> => {
-	// TODO: Replace with actual API call
-	console.log("Checking if user exists for email:", email);
-
-	// Mock implementation - return true if email contains 'existing', false otherwise
-	// In real implementation, this would be an API call to your backend
-	await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
-	return email.toLowerCase().includes("existing");
-};
