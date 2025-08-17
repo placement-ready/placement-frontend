@@ -1,18 +1,7 @@
-'use client'
-import React, { useContext, useEffect, useRef, useState } from 'react';
-// import { UserContext } from '../contexts/UserContext'; 
+import React, { useEffect, useRef, useState } from 'react';
 
-const motivators = [
-  "Dream big. Your next offer is waiting!",
-  "Stay curious, stay confident.",
-  "Every challenge is a stepping stone.",
-  "Your skills shine brightest under pressure.",
-  "Interviews are conversations, not interrogations.",
-  "You’re closer than you think—one question away."
-];
-
-// Format HH:MM:SS
-const pad = (n: number) => n.toString().padStart(2, '0');
+// Util: Format time as HH:MM:SS
+const pad = (num: number) => num.toString().padStart(2, '0');
 const formatTime = (secs: number) => {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
@@ -39,29 +28,20 @@ const AnimatedEmoji: React.FC<{ emoji: string }> = ({ emoji }) => (
 );
 
 const CountdownTimer: React.FC<CountdownProps> = ({ target }) => {
-  const [remaining, setRemaining] = useState(
+  const [remaining, setRemaining] = useState(() =>
     Math.max(Math.floor((target.getTime() - Date.now()) / 1000), 0)
   );
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<number>();
 
   useEffect(() => {
     intervalRef.current = window.setInterval(() => {
-      setRemaining(prev => Math.max(prev - 1, 0));
+      setRemaining((prev) => Math.max(prev - 1, 0));
     }, 1000);
-    return () => {
-      if (intervalRef.current !== null)
-        window.clearInterval(intervalRef.current);
-    };
+    return () => window.clearInterval(intervalRef.current);
   }, []);
 
-  if (remaining === 0)
-    return <span className="timer-display">Ready. It's Interview Time!</span>;
-
-  return (
-    <span className="timer-display" style={{ letterSpacing: "0.08em" }}>
-      {formatTime(remaining)}
-    </span>
-  );
+  if (remaining === 0) return <span className="timer-display">Interview Time!</span>;
+  return <span className="timer-display">{formatTime(remaining)}</span>;
 };
 
 const Welcomebanner = () => {
@@ -113,36 +93,29 @@ const Welcomebanner = () => {
         overflow: 'hidden'
       }}
     >
-      {/* Floating Emoji decorations */}
-      <AnimatedEmoji emoji="🧑‍💻" />
+      {/* Left Section */}
       <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center'
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        paddingRight: '44px',
       }}>
         <h2 style={{
-          fontSize: '2.1em',
+          fontSize: '2em',
           fontWeight: 700,
           color: '#148441',
           marginBottom: '12px',
-          letterSpacing: '.01em',
         }}>
-          {/* Hello {username} */}
-          Hello {username} 👋
+          Hello Vyakhya 👋, Ready for your next challenge?
         </h2>
-        <div style={{
-          fontSize: '1.2em',
-          color: '#17884a',
-          fontWeight: 600,
-          marginBottom: '8px'
-        }}>
-          Ready for your next great challenge?
-        </div>
         <div style={{
           fontSize: '1em',
           color: '#304d30',
-          marginBottom: '18px',
+          marginBottom: '26px',
           fontWeight: 500,
         }}>
-          <AnimatedEmoji emoji="⏳" /> Next Interview In:
+          Next Interview Countdown:
           <div style={{
             marginTop: '7px',
             fontSize: '2em',
@@ -210,32 +183,26 @@ const Welcomebanner = () => {
           </span>
         </div>
       </div>
-      {/* Right side: SVG illustration with shimmer */}
+      {/* Right Section */}
       <div style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 260,
-        position: 'relative'
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: '260px'
       }}>
-        <svg width={230} height={230} viewBox="0 0 220 220" fill="none">
-          {/* Interview cloud */}
-          <rect width="220" height="220" rx="48" fill="#d0f5e3" />
-          <ellipse cx="116" cy="90" rx="52" ry="38" fill="#fff" />
-          <rect x="65" y="128" width="98" height="32" rx="16" fill="#00c851" />
-          <text x="90" y="150" fontFamily="Segoe UI,Arial" fontSize="19" fill="#fff">
+        {/* Motivational SVG — easy to swap for your own */}
+        <svg width={220} height={220} viewBox="0 0 220 220" fill="none">
+          <rect width="220" height="220" rx="48" fill="#d0f5e3"/>
+          <ellipse cx="116" cy="90" rx="52" ry="38" fill="#fff"/>
+          <rect x="65" y="128" width="98" height="32" rx="16" fill="#00c851"/>
+          <text x="75" y="150" fontFamily="Segoe UI,Arial" fontSize="20" fill="#fff">
             Interview!
           </text>
-          {/* Animated shimmer */}
-          <rect x="65" y="128" width="98" height="32" rx="16" fill="url(#shimmer)" opacity="0.5" />
-          <defs>
-            <linearGradient id="shimmer">
-              <stop offset="0%" stopColor="#fff" stopOpacity="0"/>
-              <stop offset="50%" stopColor="#fff" stopOpacity="0.2"/>
-              <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
-            </linearGradient>
-          </defs>
-          {/* Person */}
-          <circle cx="116" cy="90" r="16" fill="#00c851" />
-          <rect x="108" y="108" width="16" height="22" rx="6" fill="#148441" />
-          <ellipse cx="116" cy="108" rx="24" ry="12" fill="#148441" opacity="0.07" />
+          {/* Person icon */}
+          <circle cx="116" cy="90" r="16" fill="#00c851"/>
+          <rect x="108" y="108" width="16" height="22" rx="6" fill="#148441"/>
+          <ellipse cx="116" cy="108" rx="24" ry="12" fill="#148441" opacity="0.12"/>
         </svg>
       </div>
       {/* Floating emoji, right top */}

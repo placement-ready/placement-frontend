@@ -1,214 +1,210 @@
-'use client'
+'use client';
+
 import React, { useState } from 'react';
+import {
+  MdDashboard,
+  MdBusiness,
+  MdTrackChanges,
+  MdEventNote,
+  MdStarBorder,
+  MdPerson,
+  MdLogout,
+  MdSearch,
+  MdClose,
+  MdMenu
+} from 'react-icons/md';
+
+const links = [
+  { name: 'Dashboard', icon: MdDashboard },
+  { name: 'Company Questions', icon: MdBusiness },
+  { name: 'Interview Practice', icon: MdTrackChanges },
+  { name: 'Schedule Interview', icon: MdEventNote },
+  { name: 'Reviews', icon: MdStarBorder },
+  { name: 'Profile', icon: MdPerson }
+];
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState('Learning');
+  const [isOpen, setIsOpen] = useState(true);
+  const [activeLink, setActiveLink] = useState('Dashboard');
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
-
-  const links = ['Dashboard', 'Company Questions', 'Interview Practice', 'Schedule Interview', 'Reviews', 'Profile'];
+  const handleLogout = () => {
+    window.location.href = '/';
+  };
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div
-        style={{
-          width: isOpen ? 300 : 0,
-          overflow: 'hidden',
-          background: 'linear-gradient(to bottom, #ecfdf5, #d1fae5, #a7f3d0)',
-          color: '#374151',
-          height: '100vh',
-          transition: 'width 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)',
-          boxShadow: isOpen ? '2px 0 5px rgba(0,0,0,0.5)' : 'none',
-          padding: isOpen ? 20 : 0,
-          boxSizing: 'border-box',
-          position: 'relative',
-        }}
+    <div className="flex min-h-screen bg-green-50 font-sans">
+      {/* Sidebar */}
+      <aside
+        className={`
+          ${isOpen ? 'w-64' : 'w-16'}
+          transition-all duration-500 ease-out
+          bg-gradient-to-br from-green-100 to-green-200
+          rounded-2xl shadow-lg shadow-green-500/10
+          flex flex-col ${isOpen ? 'items-start' : 'items-center'}
+          ${isOpen ? 'px-5 py-10' : 'px-2 py-10'}
+          overflow-hidden relative
+        `}
       >
-        {/* Close Button */}
-        {isOpen && (
-          <button
-            onClick={toggleSidebar}
-            style={{
-              backgroundColor: '#10b981',
-              color: 'white',
-              border: 'none',
-              padding: '8px',
-              cursor: 'pointer',
-              borderRadius: 6,
-              marginBottom: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-              transition: 'all 0.3s ease',
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              zIndex: 10,
-              transform: 'scale(1)'
-            }}
-            onMouseEnter={(e) => {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1.1)';
-              target.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1)';
-              target.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-              {/* Making cross for closing sidebar */}
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-          </button>
-        )}
+        {/* Collapse/Expand Button */}
+        <button
+          className={`
+            absolute top-6 ${isOpen ? 'right-5' : 'right-2'}
+            bg-white/80 text-green-600
+            rounded-lg w-10 h-10 shadow-sm cursor-pointer
+            flex items-center justify-center z-20
+            hover:bg-white hover:shadow-lg hover:shadow-green-200/30
+            transition-all duration-200
+          `}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {isOpen
+            ? <MdClose size={22} />
+            : <MdMenu size={22} />
+          }
+        </button>
 
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '12px', 
-          marginTop: isOpen ? '50px' : '40px'
-        }}>
-          <div style={{ 
-            background: 'linear-gradient(135deg, #34d399, #10b981)',
-            borderRadius: '12px', 
-            padding: '10px',
-            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            transform: 'scale(1)'
-          }}
-          onMouseEnter={(e) => {
-            const target = e.target as HTMLElement;
-            target.style.transform = 'scale(1.1)';
-            target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            const target = e.target as HTMLElement;
-            target.style.transform = 'scale(1)';
-            target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
-          }}>
+        {/* Logo & App Name */}
+        <div className={`
+          flex items-center gap-3
+          ${isOpen ? 'mb-8' : 'mb-3'} mt-1 w-full
+          ${isOpen ? 'justify-start' : 'justify-center'}
+          ${isOpen ? 'opacity-100' : 'opacity-90'}
+          transition-all duration-400
+        `}>
+          <div className={`
+            bg-gradient-to-br from-green-500 to-green-600
+            rounded-xl ${isOpen ? 'p-3' : 'p-2'}
+            flex items-center shadow-md
+          `}>
             <img
-                src="/brain.png"
-                alt="Brain Logo"
-                width={24}
-                height={24}
-                className="object-contain cursor-pointer"
-              />
+              src="/brain.png"
+              alt="HireMind Logo"
+              width={isOpen ? 27 : 22}
+              height={isOpen ? 27 : 22}
+              className="block"
+            />
           </div>
-          <span style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            background: 'linear-gradient(135deg, #059669, #10b981)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            cursor: 'pointer'
-          }}>
+          <span className={`
+            font-extrabold text-green-600 text-xl tracking-tight pl-1
+            ${isOpen ? 'opacity-100' : 'opacity-0'}
+            transition-opacity duration-300
+          `}>
             HireMind
           </span>
         </div>
 
-        {/* Navigation */}
-        <nav>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {links.map((link) => (
-              <li
-                key={link}
-                onClick={() => setActiveLink(link)}
-                style={{
-                  margin: '16px 0',
-                  cursor: 'pointer',
-                  padding: '8px 12px',
-                  borderRadius: 4,
-                  backgroundColor: activeLink === link ? '#10b981' : 'transparent',
-                  boxShadow: activeLink === link ? '0 0 10px 2px rgba(16, 185, 129, 0.7)' : 'none',
-                  transition: 'all 0.3s ease',
-                  color: activeLink === link ? 'white' : '#374151',
-                  transform: 'translateX(0)',
-                  // layerTransition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (activeLink !== link) {
-                    target.style.transform = 'translateX(8px)';
-                    target.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-                    target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.2)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (activeLink !== link) {
-                    target.style.transform = 'translateX(0)';
-                    target.style.backgroundColor = 'transparent';
-                    target.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                <a
-                  href="#"
-                  style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
+        {/* Search bar */}
+        <div className={`
+          ${isOpen ? 'w-11/12 mb-7 px-4 py-2' : 'w-11 mb-4 px-2 py-2'}
+          flex items-center bg-white/70 rounded-xl
+          shadow-sm transition-all duration-300
+        `}>
+          <MdSearch className="text-2xl text-green-600" />
+          {isOpen && (
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent border-0 outline-0 w-full text-base ml-2 text-green-800 placeholder-green-500"
+            />
+          )}
+        </div>
+
+        {/* Menu Links */}
+        <nav className="w-full flex-1">
+          <ul className="list-none m-0 p-0">
+            {links.map(link => {
+              const Icon = link.icon;
+              const isActive = activeLink === link.name;
+              return (
+                <li
+                  key={link.name}
+                  onClick={() => setActiveLink(link.name)}
+                  className={`
+                    ${isOpen ? 'my-3' : 'my-2'} w-full rounded-lg
+                    cursor-pointer flex items-center ${isOpen ? 'gap-4' : 'gap-0'} h-12
+                    ${isOpen ? 'justify-start' : 'justify-center'}
+                    group transition-all duration-200
+                    ${isActive
+                      ? 'bg-gradient-to-r from-green-200 to-green-300 text-green-700 shadow-md font-bold'
+                      : 'bg-transparent text-green-700 font-medium hover:bg-green-100 hover:text-green-600'
+                    }
+                  `}
                 >
-                  {link}
-                </a>
-              </li>
-            ))}
+                  <span className={`
+                    text-2xl ${isOpen ? 'ml-1' : 'ml-0.5'}
+                    ${isActive ? 'drop-shadow-md' : ''}
+                  `}>
+                    <Icon size={25} />
+                  </span>
+                  <span className={`
+                    text-base truncate
+                    ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}
+                    transition-all duration-300
+                    overflow-hidden
+                    ${!isActive ? 'group-hover:translate-x-2 group-hover:opacity-70' : ''}
+                    ${!isActive ? 'transform' : ''}
+                  `}>
+                    {link.name}
+                  </span>
+                  {/* REMOVED the green vertical bar here */}
+                </li>
+              );
+            })}
           </ul>
         </nav>
-      </div>
 
-      <div style={{ marginLeft: 10, padding: 20, flex: 1 }}>
-        {/* Open Button with Bounce Effect */}
-        {!isOpen && (
-          <button
-            onClick={toggleSidebar}
-            style={{
-              backgroundColor: '#10b981',
-              color: 'white',
-              border: 'none',
-              padding: '12px',
-              cursor: 'pointer',
-              borderRadius: 8,
-              marginBottom: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-              transition: 'all 0.3s ease',
-              transform: 'scale(1)',
-              animation: 'bounce 2s ease-in-out infinite'
-            }}
-            onMouseEnter={(e) => {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1.1)';
-              target.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
-              target.style.animationPlayState = 'paused';
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1)';
-              target.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
-              target.style.animationPlayState = 'running';
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-              {/* Sidebar icon  */}
-              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
-          </button>
+        {/* --- Profile & Logout --- */}
+        {isOpen ? (
+          <div className={`
+            w-full flex items-center justify-between
+            mt-8
+            bg-white/80 rounded-xl shadow-lg
+            px-4 py-3 transition-all duration-200
+          `}>
+            {/* Avatar only */}
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-2xl drop-shadow-lg">V</span>
+            </div>
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className={`
+                bg-red-100 text-red-500 rounded-full p-3 ml-2 shadow flex items-center justify-center hover:bg-red-200
+                transition-all duration-200
+              `}
+              aria-label="Logout"
+              title="Logout"
+            >
+              <MdLogout size={22} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center mt-4 mb-2 space-y-4 w-full">
+            {/* Avatar */}
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-2xl drop-shadow-lg">V</span>
+            </div>
+            {/* Logout icon button below */}
+            <button
+              onClick={handleLogout}
+              className={`
+                bg-red-100 text-red-500 rounded-full p-3 shadow flex items-center justify-center hover:bg-red-200
+                transition-all duration-200
+              `}
+              aria-label="Logout"
+              title="Logout"
+            >
+              <MdLogout size={22} />
+            </button>
+          </div>
         )}
-      </div>
+      </aside>
 
-      <style jsx>{`
-        @keyframes bounce {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-      `}</style>
+      {/* Main content area (placeholder) */}
+      <div className="flex-1 p-10 bg-green-50">
+        {/* Content goes here */}
+      </div>
     </div>
   );
 };

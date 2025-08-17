@@ -1,5 +1,5 @@
 import Sidebar from "./Sidebar";
-import WelcomeBanner from "./Welcome";
+import { WelcomeBanner } from "./Welcome";
 
 export default function Dashboard() {
     return (
