@@ -180,7 +180,7 @@ const Footer: React.FC = () => {
         <div className="px-4 sm:px-6 py-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-gray-400 text-sm">© 2024 HireMind. All rights reserved.</p>
+              <p className="text-gray-400 text-sm">© 2025 HireMind. All rights reserved.</p>
               <div className="flex items-center space-x-6">
                 <span className="text-gray-400 text-sm flex items-center">
                   Made with
