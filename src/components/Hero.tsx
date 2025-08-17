@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import Image from "next/image";
 import "../styles/hero.css";
+import { useRouter } from "next/navigation";
 
 const Hero: React.FC = () => {
+  const router = useRouter();
   return (
     <section className="relative min-h-screen w-full flex flex-col justify-between bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 pt-22 md:pt-24">
       {/* Centered main content */}
@@ -39,8 +41,8 @@ const Hero: React.FC = () => {
           <button className="bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition w-full sm:w-auto">
             Start Practicing
           </button>
-          <button className="border border-gray-300 font-semibold py-3 px-8 rounded-lg bg-white hover:bg-gray-50 w-full sm:w-auto">
-            View Study Plans
+          <button onClick={() => { router.push("/About"); }} className="border border-gray-300 font-semibold py-3 px-8 rounded-lg bg-white hover:bg-gray-50 w-full sm:w-auto">
+            About Us
           </button>
         </div>
 
