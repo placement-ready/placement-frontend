@@ -13,30 +13,30 @@ export const useAuthState = () => {
 		isLoading: true,
 	});
 
-	// Initialize email from localStorage on component mount
+	// Initialize email from sessionStorage on component mount
 	useEffect(() => {
-		const storedEmail = localStorage.getItem(AUTH_EMAIL_KEY);
+		const storedEmail = sessionStorage.getItem(AUTH_EMAIL_KEY);
 		setAuthState({
 			email: storedEmail,
 			isLoading: false,
 		});
 	}, []);
 
-	// Save email to localStorage
+	// Save email to sessionStorage
 	const setEmail = (email: string) => {
-		localStorage.setItem(AUTH_EMAIL_KEY, email);
+		sessionStorage.setItem(AUTH_EMAIL_KEY, email);
 		setAuthState((prev) => ({ ...prev, email }));
 	};
 
-	// Clear email from localStorage
+	// Clear email from sessionStorage
 	const clearEmail = () => {
-		localStorage.removeItem(AUTH_EMAIL_KEY);
+		sessionStorage.removeItem(AUTH_EMAIL_KEY);
 		setAuthState((prev) => ({ ...prev, email: null }));
 	};
 
-	// Get email from localStorage (synchronous)
+	// Get email from sessionStorage (synchronous)
 	const getStoredEmail = (): string | null => {
-		return localStorage.getItem(AUTH_EMAIL_KEY);
+		return sessionStorage.getItem(AUTH_EMAIL_KEY);
 	};
 
 	return {

@@ -19,7 +19,7 @@ export interface CreateUserRequest extends Record<string, string> {
 // Users API endpoints
 export const usersApi = {
 	// Get paginated users list
-	getUsers: (params?: PaginationParams) => api.get<PaginatedResponse<User>>("/users", params),
+	getUsers: (params?: PaginationParams) => api.get<PaginatedResponse<User>>(`/users/${params}`),
 
 	// Get user by ID
 	getUser: (id: string) => api.get<User>(`/users/${id}`),

@@ -24,12 +24,8 @@ const CreateAccountPassword: React.FC = () => {
 	// Initialize email from localStorage
 	useEffect(() => {
 		if (!authLoading) {
-			if (storedEmail) {
-				setEmail(storedEmail);
-			} else {
-				// No email in localStorage, redirect to create-account
-				router.push("/auth/create-account");
-			}
+			if (storedEmail) setEmail(storedEmail);
+			else router.push("/auth/create-account");
 		}
 	}, [storedEmail, authLoading, router]);
 

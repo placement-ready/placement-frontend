@@ -18,6 +18,10 @@ export const authApi = {
 	// Register new user
 	register: (userData: RegisterRequest) => api.post<RegisterResponse>("/auth/register", userData),
 
+	// Create verification token
+	createVerificationToken: (email: string) =>
+		api.post("/auth/create-verification-token", { email }),
+
 	// Verify email
 	verifyEmail: (data: VerifyEmailRequest) =>
 		api.post<VerifyEmailResponse>("/auth/verify-email", data),
@@ -46,5 +50,9 @@ export const authApi = {
 		api.post("/auth/change-password", { currentPassword, newPassword }),
 
 	// Check if user exists
-	checkUserExists: (email: string) => api.get<{ exists: boolean }>("/auth/check-user", { email }),
+	checkUserExists: (email: string) => api.get<{ exists: boolean }>(`/auth/check-email/${email}`),
+
+	// Check if email is verified
+	isEmailVerified: (email: string) =>
+		api.get<{ verified: boolean }>(`/auth/check-email-verification/${email}`),
 };

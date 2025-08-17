@@ -30,6 +30,16 @@ export const useCheckUserExists = (email: string, enabled = true) => {
 	});
 };
 
+// Check if email is verified query
+export const useCheckEmailVerified = (email: string, enabled = true) => {
+	return useQuery({
+		queryKey: ["auth", "check-email-verified", email],
+		queryFn: () => authApi.isEmailVerified(email),
+		enabled: enabled && !!email,
+		staleTime: 1000 * 60 * 2, // 2 minutes
+	});
+};
+
 // Login mutation
 export const useLogin = () => {
 	const queryClient = useQueryClient();
@@ -57,6 +67,13 @@ export const useRegister = () => {
 				queryClient.setQueryData(queryKeys.authUser(), data.data.user);
 			}
 		},
+	});
+};
+
+// Create verification token mutation
+export const useCreateVerificationToken = () => {
+	return useMutation({
+		mutationFn: (email: string) => authApi.createVerificationToken(email),
 	});
 };
 

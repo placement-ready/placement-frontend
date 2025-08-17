@@ -20,13 +20,13 @@ const EmailVerification = () => {
 	const verifyEmailMutation = useVerifyEmail();
 	const resendVerificationMutation = useResendVerification();
 
-	// Initialize email from localStorage
+	// Initialize email from sessionStorage
 	useEffect(() => {
 		if (!authLoading) {
 			if (storedEmail) {
 				setEmail(storedEmail);
 			} else {
-				// No email in localStorage, redirect to login
+				// No email in sessionStorage, redirect to login
 				router.push("/auth/login");
 			}
 		}
@@ -47,10 +47,7 @@ const EmailVerification = () => {
 			});
 
 			// Check if verification was successful
-			if (result.data.success) {
-				// Redirect to profile/dashboard after successful verification
-				router.push("/profile");
-			}
+			if (result.data.success) router.push("/profile");
 		} catch (error: unknown) {
 			console.error("Error verifying code:", error);
 			const errorMessage =

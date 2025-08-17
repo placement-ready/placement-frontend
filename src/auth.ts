@@ -96,23 +96,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				console.error("Error storing user:", error);
 			}
 		},
-		async session({ session }) {
-			try {
-				// Update last login every time session is created
-				if (session.user?.email) {
-					await fetch(`${process.env.BACKEND_URL}/api/auth/update-last-login`, {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							email: session.user.email,
-							lastLoginAt: new Date().toISOString(),
-						}),
-					});
-				}
-			} catch (err) {
-				console.error("Error updating last login:", err);
-			}
-		},
+		// async session({ session }) {
+		// 	try {
+		// 		// Update last login every time session is created
+		// 		if (session.user?.email) {
+		// 			await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/update-last-login`, {
+		// 				method: "POST",
+		// 				headers: { "Content-Type": "application/json" },
+		// 				body: JSON.stringify({
+		// 					email: session.user.email,
+		// 					lastLoginAt: new Date().toISOString(),
+		// 				}),
+		// 			});
+		// 		}
+		// 	} catch (err) {
+		// 		console.error("Error updating last login:", err);
+		// 	}
+		// },
 	},
 	secret: process.env.AUTH_SECRET,
 });

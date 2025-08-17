@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import { signIn } from "next-auth/react";
 
 interface AuthFormProps {
 	title: string;
@@ -15,7 +16,7 @@ interface AuthFormProps {
 	footerText: string;
 	footerLinkText: string;
 	footerLinkHref: string;
-	onGoogleSignIn: () => void;
+	onGoogleSignIn?: () => void;
 	showEmailField?: boolean;
 }
 
@@ -35,6 +36,19 @@ const AuthForm: React.FC<AuthFormProps> = ({
 	onGoogleSignIn,
 	showEmailField = true,
 }) => {
+	const [processing, setProcessing] = useState(false);
+
+	const handleGoogleSignIn = async () => {
+		setProcessing(true);
+		try {
+			await signIn("google", { callbackUrl: "/" });
+		} catch (error) {
+			console.error("Error signing in with Google:", error);
+		} finally {
+			setProcessing(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0fdf4] via-[#ecfdf5] to-[#d1fae5] p-4">
 			<div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-green-100 p-6 sm:p-8">
@@ -116,8 +130,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
 				{/* Google Sign In */}
 				<button
-					onClick={onGoogleSignIn}
-					disabled={isLoading}
+					onClick={onGoogleSignIn ?? handleGoogleSignIn}
+					disabled={processing}
 					className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 rounded-xl p-3 sm:p-4 font-medium text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-md transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
 				>
 					<svg
@@ -144,7 +158,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
 							fill="#EA4335"
 						/>
 					</svg>
-					{isLoading ? "Signing in..." : "Continue with Google"}
+					{processing ? "Signing in..." : "Continue with Google"}
 				</button>
 
 				{/* Terms Footer */}
