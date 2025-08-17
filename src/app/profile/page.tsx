@@ -26,7 +26,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as CheckCircleIconSolid } from "@heroicons/react/24/solid";
 import { useAuth } from "@/hooks/useAuth";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 // Types for profile data
 interface Education {
@@ -731,13 +730,4 @@ const Profile: React.FC = () => {
 	);
 };
 
-// Wrap the Profile component with authentication protection
-const ProtectedProfile: React.FC = () => {
-	return (
-		<ProtectedRoute>
-			<Profile />
-		</ProtectedRoute>
-	);
-};
-
-export default ProtectedProfile;
+export default Profile;

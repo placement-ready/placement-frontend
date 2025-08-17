@@ -7,13 +7,16 @@ export async function middleware(req: NextRequest) {
 		secret: process.env.AUTH_SECRET,
 	});
 
+	// If no token, redirect to login
 	if (!token) {
-		return NextResponse.redirect(new URL("/auth/login", req.url));
+		const loginUrl = new URL("/auth/login", req.url);
+		loginUrl.searchParams.set("callbackUrl", req.url);
+		return NextResponse.redirect(loginUrl);
 	}
 
 	return NextResponse.next();
 }
 
 export const config = {
-	matcher: ["/dashboard/:path*"], // Protect these routes
+	matcher: ["/profile/:path*", "/dashboard/:path*"], // Add more protected routes here
 };

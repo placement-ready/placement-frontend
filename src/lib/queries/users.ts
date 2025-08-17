@@ -1,37 +1,22 @@
 // Users-related React Query hooks
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usersApi, type CreateUserRequest, type UpdateUserRequest } from "@/lib/api/users";
-import { createMutation, invalidationPatterns, optimisticPatterns } from "@/lib/mutations/factory";
-import { queryKeys, getInvalidationKeys } from "./keys";
+import { queryKeys } from "./keys";
 import type { PaginationParams } from "@/types/api/common";
 
 // Get users list query
 export const useUsers = (params?: PaginationParams) => {
 	return useQuery({
-		queryKey: queryKeys.usersList(params),
+		queryKey: [...queryKeys.users(), params],
 		queryFn: () => usersApi.getUsers(params),
 		staleTime: 1000 * 60 * 5, // 5 minutes
-	});
-};
-
-// Get users with infinite scroll
-export const useInfiniteUsers = (baseParams?: Omit<PaginationParams, "page">) => {
-	return useInfiniteQuery({
-		queryKey: [...queryKeys.usersList(), "infinite", baseParams],
-		queryFn: ({ pageParam = 1 }) => usersApi.getUsers({ ...baseParams, page: pageParam }),
-		initialPageParam: 1,
-		getNextPageParam: (lastPage) => {
-			const { pagination } = lastPage.data;
-			return pagination.hasNext ? pagination.page + 1 : undefined;
-		},
-		staleTime: 1000 * 60 * 5,
 	});
 };
 
 // Get single user query
 export const useUser = (id: string, enabled = true) => {
 	return useQuery({
-		queryKey: queryKeys.usersDetail(id),
+		queryKey: queryKeys.user(id),
 		queryFn: () => usersApi.getUser(id),
 		enabled: enabled && !!id,
 		staleTime: 1000 * 60 * 5,
@@ -41,7 +26,7 @@ export const useUser = (id: string, enabled = true) => {
 // Get user profile query
 export const useUserProfile = (id: string, enabled = true) => {
 	return useQuery({
-		queryKey: queryKeys.usersProfile(id),
+		queryKey: queryKeys.userProfile(id),
 		queryFn: () => usersApi.getUserProfile(id),
 		enabled: enabled && !!id,
 		staleTime: 1000 * 60 * 5,
@@ -49,51 +34,42 @@ export const useUserProfile = (id: string, enabled = true) => {
 };
 
 // Create user mutation
-export const useCreateUser = createMutation<unknown, CreateUserRequest>({
-	mutationFn: (userData) => usersApi.createUser(userData),
-	invalidateKeys: (queryClient) => {
-		invalidationPatterns.byPrefix(queryClient, queryKeys.users());
-	},
-	onSuccessCallback: (data, variables) => {
-		console.log("User created:", data, variables);
-	},
-});
+export const useCreateUser = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (userData: CreateUserRequest) => usersApi.createUser(userData),
+		onSuccess: () => {
+			// Refresh users list
+			queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+		},
+	});
+};
 
 // Update user mutation
-export const useUpdateUser = createMutation<unknown, { id: string; data: UpdateUserRequest }>({
-	mutationFn: ({ id, data }) => usersApi.updateUser(id, data),
-	optimisticUpdate: (queryClient, { id, data }) => {
-		// Optimistically update the user in cache
-		optimisticPatterns.updateSingle(queryClient, queryKeys.usersDetail(id), data);
-		optimisticPatterns.updateSingle(queryClient, queryKeys.usersProfile(id), data);
-	},
-	invalidateKeys: (queryClient, data, { id }) => {
-		// Invalidate user-related queries
-		getInvalidationKeys.user(id).forEach((key) => {
-			queryClient.invalidateQueries({ queryKey: key });
-		});
-	},
-});
+export const useUpdateUser = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: UpdateUserRequest }) =>
+			usersApi.updateUser(id, data),
+		onSuccess: (_, variables) => {
+			// Refresh specific user and users list
+			queryClient.invalidateQueries({ queryKey: queryKeys.user(variables.id) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+		},
+	});
+};
 
 // Delete user mutation
-export const useDeleteUser = createMutation<unknown, string>({
-	mutationFn: (id) => usersApi.deleteUser(id),
-	optimisticUpdate: (queryClient, id) => {
-		// Remove user from all lists
-		queryClient.removeQueries({ queryKey: queryKeys.usersDetail(id) });
-		queryClient.removeQueries({ queryKey: queryKeys.usersProfile(id) });
-	},
-	invalidateKeys: (queryClient) => {
-		invalidationPatterns.byPrefix(queryClient, queryKeys.users());
-	},
-});
+export const useDeleteUser = () => {
+	const queryClient = useQueryClient();
 
-// Upload avatar mutation
-export const useUploadAvatar = createMutation<{ url: string }, { id: string; file: File }>({
-	mutationFn: ({ id, file }) => usersApi.uploadAvatar(id, file),
-	invalidateKeys: (queryClient, data, { id }) => {
-		// Update user data with new avatar URL
-		optimisticPatterns.updateSingle(queryClient, queryKeys.usersDetail(id), { avatar: data.url });
-		optimisticPatterns.updateSingle(queryClient, queryKeys.usersProfile(id), { avatar: data.url });
-	},
-});
+	return useMutation({
+		mutationFn: (id: string) => usersApi.deleteUser(id),
+		onSuccess: () => {
+			// Refresh users list
+			queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+		},
+	});
+};

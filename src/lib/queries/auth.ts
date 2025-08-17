@@ -1,8 +1,14 @@
 // Auth-related React Query hooks
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/api/auth";
-import { queryKeys, getInvalidationKeys } from "./keys";
-import type { LoginRequest, RegisterRequest, VerifyEmailRequest } from "@/types/api/common";
+import { queryKeys } from "./keys";
+import type {
+	LoginRequest,
+	RegisterRequest,
+	VerifyEmailRequest,
+	LoginResponse,
+	RegisterResponse,
+} from "@/types/api/common";
 
 // Get current user query
 export const useCurrentUser = () => {
@@ -17,7 +23,7 @@ export const useCurrentUser = () => {
 // Check if user exists query
 export const useCheckUserExists = (email: string, enabled = true) => {
 	return useQuery({
-		queryKey: [...queryKeys.auth(), "check-user", email],
+		queryKey: ["auth", "check-user", email],
 		queryFn: () => authApi.checkUserExists(email),
 		enabled: enabled && !!email,
 		staleTime: 1000 * 60 * 2, // 2 minutes
@@ -30,17 +36,11 @@ export const useLogin = () => {
 
 	return useMutation({
 		mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
-		onSuccess: (data) => {
+		onSuccess: (data: { data: LoginResponse }) => {
 			// Set user data in cache
 			queryClient.setQueryData(queryKeys.authUser(), data.data.user);
-
-			// Invalidate auth-related queries
-			getInvalidationKeys.auth().forEach((key) => {
-				queryClient.invalidateQueries({ queryKey: key });
-			});
-		},
-		onError: (error) => {
-			console.error("Login failed:", error);
+			// Refresh auth queries
+			queryClient.invalidateQueries({ queryKey: queryKeys.auth() });
 		},
 	});
 };
@@ -51,14 +51,11 @@ export const useRegister = () => {
 
 	return useMutation({
 		mutationFn: (userData: RegisterRequest) => authApi.register(userData),
-		onSuccess: (data) => {
+		onSuccess: (data: { data: RegisterResponse }) => {
 			// Set user data in cache if registration includes login
 			if ("user" in data.data) {
 				queryClient.setQueryData(queryKeys.authUser(), data.data.user);
 			}
-		},
-		onError: (error) => {
-			console.error("Registration failed:", error);
 		},
 	});
 };
@@ -67,9 +64,6 @@ export const useRegister = () => {
 export const useVerifyEmail = () => {
 	return useMutation({
 		mutationFn: (data: VerifyEmailRequest) => authApi.verifyEmail(data),
-		onError: (error) => {
-			console.error("Email verification failed:", error);
-		},
 	});
 };
 
@@ -77,9 +71,6 @@ export const useVerifyEmail = () => {
 export const useResendVerification = () => {
 	return useMutation({
 		mutationFn: (email: string) => authApi.resendVerification(email),
-		onError: (error) => {
-			console.error("Resend verification failed:", error);
-		},
 	});
 };
 
@@ -93,8 +84,7 @@ export const useLogout = () => {
 			// Clear all cached data
 			queryClient.clear();
 		},
-		onError: (error) => {
-			console.error("Logout failed:", error);
+		onError: () => {
 			// Even if logout fails on server, clear local cache
 			queryClient.clear();
 		},
@@ -105,9 +95,6 @@ export const useLogout = () => {
 export const useRequestPasswordReset = () => {
 	return useMutation({
 		mutationFn: (email: string) => authApi.requestPasswordReset(email),
-		onError: (error) => {
-			console.error("Password reset request failed:", error);
-		},
 	});
 };
 
@@ -116,9 +103,6 @@ export const useResetPassword = () => {
 	return useMutation({
 		mutationFn: ({ token, password }: { token: string; password: string }) =>
 			authApi.resetPassword(token, password),
-		onError: (error) => {
-			console.error("Password reset failed:", error);
-		},
 	});
 };
 
@@ -132,8 +116,5 @@ export const useChangePassword = () => {
 			currentPassword: string;
 			newPassword: string;
 		}) => authApi.changePassword(currentPassword, newPassword),
-		onError: (error) => {
-			console.error("Password change failed:", error);
-		},
 	});
 };
