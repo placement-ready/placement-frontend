@@ -24,7 +24,7 @@ export const authApi = {
 
 	// Verify email
 	verifyEmail: (data: VerifyEmailRequest) =>
-		api.post<VerifyEmailResponse>("/auth/verify-email", data),
+		api.post<VerifyEmailResponse>("/auth/verify-email", { data }),
 
 	// Resend verification email
 	resendVerification: (email: string) => api.post("/auth/resend-verification", { email }),

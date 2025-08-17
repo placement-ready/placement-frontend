@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
-import { useCheckEmailVerified } from "@/lib/queries";
+import { useCheckEmailVerified, useCreateVerificationToken } from "@/lib/queries";
 
 const LoginPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -19,6 +19,7 @@ const LoginPassword: React.FC = () => {
 
 	// React Query mutation for checking email verification
 	const checkEmailVerification = useCheckEmailVerified(email);
+	const createTokenMutation = useCreateVerificationToken();
 
 	// Initialize email from sessionStorage
 	useEffect(() => {
@@ -42,14 +43,23 @@ const LoginPassword: React.FC = () => {
 				redirect: false,
 			});
 
-			if (!checkEmailVerification.data) {
+			if (!checkEmailVerification.data?.verified) {
+				try {
+					// Use React Query mutation for creating verification token
+					await createTokenMutation.mutateAsync(email);
+				} catch (error: unknown) {
+					console.error("Error sending email:", error);
+					const errorMessage =
+						error instanceof Error ? error.message : "Failed to send email. Please try again.";
+					setError(errorMessage);
+				}
 				router.push("/auth/email-verification");
-			}
-
-			if (res?.ok) {
-				router.push("/profile");
 			} else {
-				setError("Login failed. Please try again.");
+				if (res?.ok) {
+					router.push("/profile");
+				} else {
+					setError("Login failed. Please try again.");
+				}
 			}
 		} catch (error: unknown) {
 			console.error("Login error:", error);

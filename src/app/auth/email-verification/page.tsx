@@ -5,7 +5,7 @@ import Image from "next/image";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "@/hooks/useAuthState";
-import { useVerifyEmail, useResendVerification } from "@/lib/queries/auth";
+import { useVerifyEmail, useCreateVerificationToken } from "@/lib/queries/auth";
 
 const EmailVerification = () => {
 	const [verificationCode, setVerificationCode] = useState("");
@@ -18,7 +18,7 @@ const EmailVerification = () => {
 
 	// React Query mutations
 	const verifyEmailMutation = useVerifyEmail();
-	const resendVerificationMutation = useResendVerification();
+	const createTokenMutation = useCreateVerificationToken();
 
 	// Initialize email from sessionStorage
 	useEffect(() => {
@@ -47,7 +47,7 @@ const EmailVerification = () => {
 			});
 
 			// Check if verification was successful
-			if (result.data.success) router.push("/profile");
+			if (result.success) router.push("/profile");
 		} catch (error: unknown) {
 			console.error("Error verifying code:", error);
 			const errorMessage =
@@ -63,9 +63,8 @@ const EmailVerification = () => {
 
 		try {
 			// Use React Query mutation for resending verification email
-			await resendVerificationMutation.mutateAsync(email);
-			// Show success message (you might want to add a success state)
-			console.log("Verification email resent successfully");
+			await createTokenMutation.mutateAsync(email);
+			setVerificationCode("");
 		} catch (error: unknown) {
 			console.error("Error resending email:", error);
 			const errorMessage =
@@ -151,10 +150,10 @@ const EmailVerification = () => {
 						Didn&apos;t receive the email?{" "}
 						<button
 							onClick={handleResendEmail}
-							disabled={resendVerificationMutation.isPending}
+							disabled={createTokenMutation.isPending}
 							className="text-green-600 hover:text-green-700 font-medium transition-colors duration-200 underline bg-transparent border-none cursor-pointer disabled:opacity-50"
 						>
-							{resendVerificationMutation.isPending ? "Sending..." : "Resend Email"}
+							{createTokenMutation.isPending ? "Sending..." : "Resend Email"}
 						</button>
 					</p>
 				</div>

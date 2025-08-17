@@ -46,10 +46,8 @@ export const useLogin = () => {
 
 	return useMutation({
 		mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
-		onSuccess: (data: { data: LoginResponse }) => {
-			// Set user data in cache
-			queryClient.setQueryData(queryKeys.authUser(), data.data.user);
-			// Refresh auth queries
+		onSuccess: (data: LoginResponse) => {
+			queryClient.setQueryData(queryKeys.authUser(), data.user);
 			queryClient.invalidateQueries({ queryKey: queryKeys.auth() });
 		},
 	});
@@ -61,10 +59,9 @@ export const useRegister = () => {
 
 	return useMutation({
 		mutationFn: (userData: RegisterRequest) => authApi.register(userData),
-		onSuccess: (data: { data: RegisterResponse }) => {
-			// Set user data in cache if registration includes login
-			if ("user" in data.data) {
-				queryClient.setQueryData(queryKeys.authUser(), data.data.user);
+		onSuccess: (data: RegisterResponse) => {
+			if (data.user) {
+				queryClient.setQueryData(queryKeys.authUser(), data.user);
 			}
 		},
 	});

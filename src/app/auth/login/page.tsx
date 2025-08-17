@@ -30,7 +30,7 @@ const Login: React.FC = () => {
 
 			// Use React Query to check if user exists
 			const result = await checkUser();
-			const userExists = result.data?.data?.exists || false;
+			const userExists = result.data?.exists || false;
 
 			if (userExists) router.push("/auth/login/password");
 			else router.push("/auth/create-account/password");

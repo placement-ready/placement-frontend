@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
-import { useRegister } from "@/lib/queries/auth";
+import { useRegister, useCreateVerificationToken } from "@/lib/queries/auth";
 
 const CreateAccountPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -20,6 +20,7 @@ const CreateAccountPassword: React.FC = () => {
 
 	// React Query mutation for registration
 	const registerMutation = useRegister();
+	const createTokenMutation = useCreateVerificationToken();
 
 	// Initialize email from localStorage
 	useEffect(() => {
@@ -72,10 +73,19 @@ const CreateAccountPassword: React.FC = () => {
 				password,
 				name: email.split("@")[0], // Use email prefix as default name
 			});
+			console.log("Registration result:", result);
 
 			// Check if registration was successful
-			if (result.data.user) {
-				// Redirect to email verification
+			if (result.user) {
+				try {
+					// Use React Query mutation for creating verification token
+					await createTokenMutation.mutateAsync(email);
+				} catch (error: unknown) {
+					console.error("Error sending email:", error);
+					const errorMessage =
+						error instanceof Error ? error.message : "Failed to send email. Please try again.";
+					setError(errorMessage);
+				}
 				router.push("/auth/email-verification");
 			}
 		} catch (error: unknown) {

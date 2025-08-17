@@ -1,20 +1,11 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-export interface ApiResponse<T = unknown> {
-	data: T;
-	message: string;
-	success: boolean;
-}
-
 export interface ApiError {
 	message: string;
 	status: number;
 }
 
-async function apiRequest<T = unknown>(
-	endpoint: string,
-	options: RequestInit = {}
-): Promise<ApiResponse<T>> {
+async function apiRequest<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T> {
 	const url = `${API_BASE_URL}${endpoint}`;
 
 	const config: RequestInit = {
@@ -35,14 +26,19 @@ async function apiRequest<T = unknown>(
 			} as ApiError;
 		}
 
-		const data = await response.json();
-		return data;
+		// Try to parse as JSON, fallback to text
+		const contentType = response.headers.get("content-type");
+		if (contentType && contentType.includes("application/json")) {
+			return await response.json();
+		} else {
+			return (await response.text()) as unknown as T;
+		}
 	} catch (error) {
 		console.error("API request failed:", error);
 		throw error;
 	}
 }
-// API methods
+
 export const api = {
 	get: <T = unknown>(endpoint: string) => apiRequest<T>(endpoint),
 
