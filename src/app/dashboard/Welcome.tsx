@@ -1,3 +1,5 @@
+'use-client';
+
 import React, { useEffect, useRef, useState } from 'react';
 
 // Util: Format time as HH:MM:SS
@@ -6,7 +8,8 @@ const formatTime = (secs: number) => {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
   const s = secs % 60;
-  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  return `${pad(h)}:${pad(m)
+  }:${pad(s)}`;
 };
 
 type CountdownProps = { target: Date };
@@ -31,7 +34,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ target }) => {
   const [remaining, setRemaining] = useState(() =>
     Math.max(Math.floor((target.getTime() - Date.now()) / 1000), 0)
   );
-  const intervalRef = useRef<number>();
+  const intervalRef = useRef<number>(0);
 
   useEffect(() => {
     intervalRef.current = window.setInterval(() => {
@@ -43,6 +46,14 @@ const CountdownTimer: React.FC<CountdownProps> = ({ target }) => {
   if (remaining === 0) return <span className="timer-display">Interview Time!</span>;
   return <span className="timer-display">{formatTime(remaining)}</span>;
 };
+
+const motivators = [
+  "Keep pushing forward!",
+  "Every interview is a new opportunity.",
+  "You’re getting better every day.",
+  "Stay confident and positive!",
+  "Success is just around the corner."
+];
 
 const Welcomebanner = () => {
   // Uncomment and adapt if you use context/provider
