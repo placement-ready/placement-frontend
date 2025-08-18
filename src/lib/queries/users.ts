@@ -33,6 +33,15 @@ export const useUserProfile = (id: string, enabled = true) => {
 	});
 };
 
+// Get profile query
+export const useGetProfile = () => {
+	return useQuery({
+		queryKey: queryKeys.profile(),
+		queryFn: () => usersApi.getProfile(),
+		staleTime: 1000 * 60 * 5,
+	});
+};
+
 // Create user mutation
 export const useCreateUser = () => {
 	const queryClient = useQueryClient();

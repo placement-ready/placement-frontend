@@ -10,16 +10,6 @@ import type {
 	RegisterResponse,
 } from "@/types/api/common";
 
-// Get current user query
-export const useCurrentUser = () => {
-	return useQuery({
-		queryKey: queryKeys.authUser(),
-		queryFn: () => authApi.getCurrentUser(),
-		staleTime: 1000 * 60 * 5, // 5 minutes
-		retry: 1,
-	});
-};
-
 // Check if user exists query
 export const useCheckUserExists = (email: string, enabled = true) => {
 	return useQuery({
@@ -93,7 +83,7 @@ export const useLogout = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: () => authApi.logout(),
+		mutationFn: (refreshToken: string) => authApi.logout(refreshToken),
 		onSuccess: () => {
 			// Clear all cached data
 			queryClient.clear();

@@ -27,6 +27,9 @@ export const usersApi = {
 	// Get user profile
 	getUserProfile: (id: string) => api.get<User>(`/users/${id}/profile`),
 
+	// Get profile
+	getProfile: () => api.get<User>("/user/profile"),
+
 	// Create new user
 	createUser: (userData: CreateUserRequest) => api.post<User>("/users", userData),
 

@@ -7,7 +7,6 @@ import type {
 	RegisterResponse,
 	VerifyEmailRequest,
 	VerifyEmailResponse,
-	User,
 } from "@/types/api/common";
 
 // Auth API endpoints
@@ -29,11 +28,8 @@ export const authApi = {
 	// Resend verification email
 	resendVerification: (email: string) => api.post("/auth/resend-verification", { email }),
 
-	// Get current user
-	getCurrentUser: () => api.get<User>("/auth/me"),
-
 	// Logout user
-	logout: () => api.post("/auth/logout"),
+	logout: (refreshToken: string) => api.post("/auth/logout", { refreshToken }),
 
 	// Refresh access token
 	refreshToken: () => api.post<{ accessToken: string }>("/auth/refresh"),
