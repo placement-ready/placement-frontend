@@ -1,4 +1,4 @@
-'use-client';
+'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -8,41 +8,31 @@ const formatTime = (secs: number) => {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
   const s = secs % 60;
-  return `${pad(h)}:${pad(m)
-  }:${pad(s)}`;
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
 };
 
 type CountdownProps = { target: Date };
 
-const AnimatedEmoji: React.FC<{ emoji: string }> = ({ emoji }) => (
-  <span style={{
-    display: 'inline-block',
-    animation: 'float 2s ease-in-out infinite',
-    fontSize: '2em'
-  }}>
-    {emoji}
-    <style>{`
-      @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px);}
-      }
-    `}</style>
-  </span>
-);
-
+// Only start timer on client
 const CountdownTimer: React.FC<CountdownProps> = ({ target }) => {
-  const [remaining, setRemaining] = useState(() =>
-    Math.max(Math.floor((target.getTime() - Date.now()) / 1000), 0)
-  );
+  const [remaining, setRemaining] = useState<number | null>(null);
   const intervalRef = useRef<number>(0);
 
   useEffect(() => {
-    intervalRef.current = window.setInterval(() => {
-      setRemaining((prev) => Math.max(prev - 1, 0));
-    }, 1000);
-    return () => window.clearInterval(intervalRef.current);
-  }, []);
+    const calcRemaining = () => Math.max(Math.floor((target.getTime() - Date.now()) / 1000), 0);
+    setRemaining(calcRemaining());
 
+    intervalRef.current = window.setInterval(() => {
+      setRemaining(prev => {
+        if (prev === null) return calcRemaining();
+        return Math.max(prev - 1, 0);
+      });
+    }, 1000);
+
+    return () => window.clearInterval(intervalRef.current);
+  }, [target]);
+
+  if (remaining === null) return null;
   if (remaining === 0) return <span className="timer-display">Interview Time!</span>;
   return <span className="timer-display">{formatTime(remaining)}</span>;
 };
@@ -55,16 +45,17 @@ const motivators = [
   "Success is just around the corner."
 ];
 
-const Welcomebanner = () => {
-  // Uncomment and adapt if you use context/provider
-  // const { username } = useContext(UserContext);
+const Welcomebanner: React.FC = () => {
+  // For demo, static username
+  const username = "User";
 
-  // For demo, static username:
-  const username = "User"; // Swap with context/prop/session/api
+  // Only calculate date on client
+  const [nextInterviewDate, setNextInterviewDate] = useState<Date | null>(null);
+  useEffect(() => {
+    setNextInterviewDate(new Date(Date.now() + 15 * 3600 * 1000));
+  }, []);
 
-  const nextInterviewDate = new Date(Date.now() + 15 * 3600 * 1000);
-
-  // Motivator ticker (animated news-style)
+  // Motivator ticker
   const [motivatorIdx, setMotivatorIdx] = useState(0);
   const [animating, setAnimating] = useState(false);
   const lastSwitch = useRef(Date.now());
@@ -76,7 +67,7 @@ const Welcomebanner = () => {
         setMotivatorIdx(idx => (idx + 1) % motivators.length);
         setAnimating(false);
         lastSwitch.current = Date.now();
-      }, 420); // Animation duration matches transition!
+      }, 420);
     }, 3500);
     return () => clearInterval(motiInterval);
   }, []);
@@ -134,7 +125,7 @@ const Welcomebanner = () => {
             fontFamily: 'monospace',
             fontWeight: 'bold'
           }}>
-            <CountdownTimer target={nextInterviewDate} />
+            {nextInterviewDate && <CountdownTimer target={nextInterviewDate} />}
           </div>
         </div>
         {/* Button with reduced width */}
@@ -202,24 +193,27 @@ const Welcomebanner = () => {
         justifyContent: 'center',
         minWidth: '260px'
       }}>
-        {/* Motivational SVG — easy to swap for your own */}
+        {/* Motivational SVG */}
         <svg width={220} height={220} viewBox="0 0 220 220" fill="none">
-          <rect width="220" height="220" rx="48" fill="#d0f5e3"/>
-          <ellipse cx="116" cy="90" rx="52" ry="38" fill="#fff"/>
-          <rect x="65" y="128" width="98" height="32" rx="16" fill="#00c851"/>
+          <rect width="220" height="220" rx="48" fill="#d0f5e3" />
+          <ellipse cx="116" cy="90" rx="52" ry="38" fill="#fff" />
+          <rect x="65" y="128" width="98" height="32" rx="16" fill="#00c851" />
           <text x="75" y="150" fontFamily="Segoe UI,Arial" fontSize="20" fill="#fff">
             Interview!
           </text>
-          {/* Person icon */}
-          <circle cx="116" cy="90" r="16" fill="#00c851"/>
-          <rect x="108" y="108" width="16" height="22" rx="6" fill="#148441"/>
-          <ellipse cx="116" cy="108" rx="24" ry="12" fill="#148441" opacity="0.12"/>
+          <circle cx="116" cy="90" r="16" fill="#00c851" />
+          <rect x="108" y="108" width="16" height="22" rx="6" fill="#148441" />
+          <ellipse cx="116" cy="108" rx="24" ry="12" fill="#148441" opacity="0.12" />
         </svg>
       </div>
       {/* Floating emoji, right top */}
       <div style={{
-        position: "absolute", right: 30, top: 14, fontSize: "2em", opacity: 0.7,
-        animation: "float 3.5s ease-in-out infinite"
+        position: 'absolute',
+        right: 30,
+        top: 14,
+        fontSize: '2em',
+        opacity: 0.7,
+        animation: 'float 3.5s ease-in-out infinite',
       }}>💡</div>
       <style>{`
         @keyframes float {
