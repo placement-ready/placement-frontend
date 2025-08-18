@@ -37,14 +37,10 @@ const LoginPassword: React.FC = () => {
 		setError("");
 
 		try {
-			const res = await signIn("credentials", {
-				email,
-				password,
-				redirect: false,
-			});
-
 			if (!checkEmailVerification.data?.verified) {
 				try {
+					// Store password in sessionStorage
+					sessionStorage.setItem("auth_password", password);
 					// Use React Query mutation for creating verification token
 					await createTokenMutation.mutateAsync(email);
 				} catch (error: unknown) {
@@ -55,6 +51,12 @@ const LoginPassword: React.FC = () => {
 				}
 				router.push("/auth/email-verification");
 			} else {
+				const res = await signIn("credentials", {
+					email,
+					password,
+					redirect: false,
+				});
+
 				if (res?.ok) {
 					router.push("/profile");
 				} else {

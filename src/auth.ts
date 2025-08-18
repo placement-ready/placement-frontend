@@ -2,6 +2,19 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 
+declare module "next-auth" {
+	interface Session {
+		accessToken?: string;
+		refreshToken?: string;
+		user: {
+			id?: string;
+			name?: string | null;
+			email?: string | null;
+			image?: string | null;
+		};
+	}
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	providers: [
 		Google({
@@ -37,7 +50,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						throw new Error("Invalid email or password");
 					}
 
-					const user = await response.json();
+					const data = await response.json();
+					const user = data.user;
 					return user;
 				} catch (error) {
 					console.error("Error during credentials authorization:", error);
@@ -55,20 +69,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		error: "/auth/error",
 	},
 	callbacks: {
-		async jwt({ token, account, profile, user }) {
-			if (account && profile) {
-				console.log("JWT Callback - Token:", token);
-				console.log("JWT Callback - Account:", account);
-				console.log("JWT Callback - Profile:", profile);
+		async jwt({ token, user, account }) {
+			// First login (credentials or oauth)
+			if (user) {
 				console.log("JWT Callback - User:", user);
-				token.accessToken = account.access_token;
-				token.refreshToken = account.refresh_token;
-				token.id = profile.sub;
+				const customUser = user as typeof user & { accessToken?: string; refreshToken?: string };
+				token.accessToken = customUser.accessToken || account?.access_token;
+				token.refreshToken = customUser.refreshToken || account?.refresh_token;
+				token.id = user.id || account?.providerAccountId;
 			}
+
 			return token;
 		},
 		async session({ session, token }) {
 			session.user.id = token.id as string;
+			session.accessToken = token.accessToken as string;
+			session.refreshToken = token.refreshToken as string;
 			return session;
 		},
 	},
@@ -76,7 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		async signIn({ user, account, profile }) {
 			if (account?.provider !== "google") return;
 			try {
-				await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+				await fetch(`${process.env.NEXT_PUBLIC_API_URL}/google/register`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 interface AuthState {
 	email: string | null;
+	password?: string | null; // Added optional password field
 	isLoading: boolean;
 }
 
@@ -23,15 +24,19 @@ export const useAuthState = () => {
 	}, []);
 
 	// Save email to sessionStorage
-	const setEmail = (email: string) => {
+	const setEmail = (email: string, password?: string) => {
 		sessionStorage.setItem(AUTH_EMAIL_KEY, email);
-		setAuthState((prev) => ({ ...prev, email }));
+		if (password) {
+			sessionStorage.setItem("auth_password", password);
+		}
+		setAuthState((prev) => ({ ...prev, email, password: password || null }));
 	};
 
-	// Clear email from sessionStorage
-	const clearEmail = () => {
+	// Clear email and password from sessionStorage
+	const clearData = () => {
 		sessionStorage.removeItem(AUTH_EMAIL_KEY);
-		setAuthState((prev) => ({ ...prev, email: null }));
+		sessionStorage.removeItem("auth_password");
+		setAuthState((prev) => ({ ...prev, email: null, password: null }));
 	};
 
 	// Get email from sessionStorage (synchronous)
@@ -39,11 +44,18 @@ export const useAuthState = () => {
 		return sessionStorage.getItem(AUTH_EMAIL_KEY);
 	};
 
+	// Get password from sessionStorage (synchronous)
+	const getStoredPassword = (): string | null => {
+		return sessionStorage.getItem("auth_password");
+	};
+
 	return {
 		email: authState.email,
+		password: authState.password, // Expose password in the return object
 		isLoading: authState.isLoading,
 		setEmail,
-		clearEmail,
+		clearData,
 		getStoredEmail,
+		getStoredPassword, // Expose getStoredPassword
 	};
 };

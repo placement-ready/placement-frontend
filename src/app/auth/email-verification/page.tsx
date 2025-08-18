@@ -6,6 +6,7 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useVerifyEmail, useCreateVerificationToken } from "@/lib/queries/auth";
+import { signIn } from "next-auth/react";
 
 const EmailVerification = () => {
 	const [verificationCode, setVerificationCode] = useState("");
@@ -14,7 +15,12 @@ const EmailVerification = () => {
 	const [error, setError] = useState("");
 
 	const router = useRouter();
-	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+	const {
+		email: storedEmail,
+		password: storedPassword,
+		isLoading: authLoading,
+		clearData,
+	} = useAuthState();
 
 	// React Query mutations
 	const verifyEmailMutation = useVerifyEmail();
@@ -45,6 +51,14 @@ const EmailVerification = () => {
 				email,
 				code: verificationCode,
 			});
+
+			await signIn("credentials", {
+				email,
+				password: storedPassword,
+				redirect: false,
+			});
+
+			clearData(); // Clear email and password from sessionStorage
 
 			// Check if verification was successful
 			if (result.success) router.push("/profile");

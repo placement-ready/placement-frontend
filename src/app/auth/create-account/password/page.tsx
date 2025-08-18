@@ -73,11 +73,12 @@ const CreateAccountPassword: React.FC = () => {
 				password,
 				name: email.split("@")[0], // Use email prefix as default name
 			});
-			console.log("Registration result:", result);
 
 			// Check if registration was successful
 			if (result.user) {
 				try {
+					// Store password in sessionStorage
+					sessionStorage.setItem("auth_password", password);
 					// Use React Query mutation for creating verification token
 					await createTokenMutation.mutateAsync(email);
 				} catch (error: unknown) {
