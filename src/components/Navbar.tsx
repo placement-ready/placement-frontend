@@ -210,7 +210,7 @@ const Navbar = () => {
 											<DropdownItem
 												icon={<UserIcon className="h-5 w-5" />}
 												label="Profile"
-												href="/profile"
+												href="/dashboard/profile"
 											/>
 											<DropdownItem
 												icon={<ArrowRightStartOnRectangleIcon className="h-5 w-5" />}
@@ -287,7 +287,7 @@ const Navbar = () => {
 									</div>
 									<div className="space-y-1">
 										<a
-											href="/profile"
+											href="/dashboard/profile"
 											className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 											onClick={() => setMobileMenuOpen(false)}
 										>

@@ -24,7 +24,7 @@ export function ProtectedRoute({
 				router.push(redirectTo);
 			} else if (!requireAuth && isAuthenticated) {
 				// Redirect authenticated users away from auth pages
-				router.push("/profile");
+				router.push("/dashboard/profile");
 			}
 		}
 	}, [isAuthenticated, isLoading, requireAuth, redirectTo, router]);

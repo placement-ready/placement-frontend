@@ -60,7 +60,7 @@ const EmailVerification = () => {
 				try {
 					await authLogin(email, passwordToUse);
 					clearData();
-					router.push("/profile");
+					router.push("/dashboard");
 				} catch (loginError) {
 					console.error("Login after verification failed:", loginError);
 					setError("Email verified, but login failed. Please try logging in again.");

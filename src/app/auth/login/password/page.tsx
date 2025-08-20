@@ -54,7 +54,7 @@ const LoginPassword: React.FC = () => {
 			} else {
 				try {
 					await authLogin(email, password);
-					router.push("/profile");
+					router.push("/dashboard");
 				} catch (loginError: unknown) {
 					const errorMessage =
 						loginError instanceof Error ? loginError.message : "Login failed. Please try again.";
