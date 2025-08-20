@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/lib/auth/context";
 import { useState } from "react";
 
 interface ProvidersProps {
@@ -33,10 +33,10 @@ export default function Providers({ children }: ProvidersProps) {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<SessionProvider>
+			<AuthProvider>
 				{children}
 				<ReactQueryDevtools initialIsOpen={false} />
-			</SessionProvider>
+			</AuthProvider>
 		</QueryClientProvider>
 	);
 }

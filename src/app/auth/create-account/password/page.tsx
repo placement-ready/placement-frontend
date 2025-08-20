@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
-import { useRegister, useCreateVerificationToken } from "@/lib/queries/auth";
+import { useCreateVerificationToken } from "@/lib/queries/auth";
+import { useAuth } from "@/lib/auth/context";
 
 const CreateAccountPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -17,9 +18,9 @@ const CreateAccountPassword: React.FC = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+	const { register } = useAuth();
 
-	// React Query mutation for registration
-	const registerMutation = useRegister();
+	// React Query mutation for creating verification token
 	const createTokenMutation = useCreateVerificationToken();
 
 	// Initialize email from localStorage
@@ -67,28 +68,21 @@ const CreateAccountPassword: React.FC = () => {
 		setError("");
 
 		try {
-			// Use React Query mutation for registration
-			const result = await registerMutation.mutateAsync({
-				email,
-				password,
-				name: email.split("@")[0], // Use email prefix as default name
-			});
+			// Use auth context for registration
+			await register(email, password, email.split("@")[0]); // Use email prefix as default name
 
-			// Check if registration was successful
-			if (result.user) {
-				try {
-					// Store password in sessionStorage
-					sessionStorage.setItem("auth_password", password);
-					// Use React Query mutation for creating verification token
-					await createTokenMutation.mutateAsync(email);
-				} catch (error: unknown) {
-					console.error("Error sending email:", error);
-					const errorMessage =
-						error instanceof Error ? error.message : "Failed to send email. Please try again.";
-					setError(errorMessage);
-				}
-				router.push("/auth/email-verification");
+			try {
+				// Store password in sessionStorage
+				sessionStorage.setItem("auth_password", password);
+				// Use React Query mutation for creating verification token
+				await createTokenMutation.mutateAsync(email);
+			} catch (error: unknown) {
+				console.error("Error sending email:", error);
+				const errorMessage =
+					error instanceof Error ? error.message : "Failed to send email. Please try again.";
+				setError(errorMessage);
 			}
+			router.push("/auth/email-verification");
 		} catch (error: unknown) {
 			console.error("Account creation error:", error);
 			const errorMessage =
@@ -119,7 +113,7 @@ const CreateAccountPassword: React.FC = () => {
 			confirmPassword={confirmPassword}
 			setConfirmPassword={setConfirmPassword}
 			onSubmit={handlePasswordSubmit}
-			isLoading={isLoading || registerMutation.isPending}
+			isLoading={isLoading || createTokenMutation.isPending}
 			error={error}
 			showPassword={showPassword}
 			setShowPassword={setShowPassword}

@@ -23,7 +23,7 @@ export const authApi = {
 
 	// Verify email
 	verifyEmail: (data: VerifyEmailRequest) =>
-		api.post<VerifyEmailResponse>("/auth/verify-email", { data }),
+		api.post<VerifyEmailResponse>("/auth/verify-email", data),
 
 	// Resend verification email
 	resendVerification: (email: string) => api.post("/auth/resend-verification", { email }),
@@ -32,7 +32,10 @@ export const authApi = {
 	logout: (refreshToken: string) => api.post("/auth/logout", { refreshToken }),
 
 	// Refresh access token
-	refreshToken: () => api.post<{ accessToken: string }>("/auth/refresh"),
+	refreshToken: (refreshToken: string) =>
+		api.post<{ accessToken: string; refreshToken?: string; expiresIn: number }>("/auth/refresh", {
+			refreshToken,
+		}),
 
 	// Request password reset
 	requestPasswordReset: (email: string) => api.post("/auth/forgot-password", { email }),

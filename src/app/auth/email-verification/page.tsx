@@ -6,7 +6,7 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useVerifyEmail, useCreateVerificationToken } from "@/lib/queries/auth";
-import { signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 
 const EmailVerification = () => {
 	const [verificationCode, setVerificationCode] = useState("");
@@ -21,6 +21,7 @@ const EmailVerification = () => {
 		isLoading: authLoading,
 		clearData,
 	} = useAuthState();
+	const { authLogin } = useAuth();
 
 	// React Query mutations
 	const verifyEmailMutation = useVerifyEmail();
@@ -52,16 +53,16 @@ const EmailVerification = () => {
 				code: verificationCode,
 			});
 
-			await signIn("credentials", {
-				email,
-				password: storedPassword,
-				redirect: false,
-			});
-
-			clearData(); // Clear email and password from sessionStorage
-
-			// Check if verification was successful
-			if (result.success) router.push("/profile");
+			if (result.success && storedPassword) {
+				try {
+					await authLogin(email, storedPassword);
+					clearData();
+					router.push("/profile");
+				} catch (loginError) {
+					console.error("Login after verification failed:", loginError);
+					setError("Email verified, but login failed. Please try logging in again.");
+				}
+			}
 		} catch (error: unknown) {
 			console.error("Error verifying code:", error);
 			const errorMessage =

@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/api/auth";
 import { queryKeys } from "./keys";
+import { useAuth } from "@/lib/auth/context";
 import type {
 	LoginRequest,
 	RegisterRequest,
@@ -33,12 +34,18 @@ export const useCheckEmailVerified = (email: string, enabled = true) => {
 // Login mutation
 export const useLogin = () => {
 	const queryClient = useQueryClient();
+	const { login } = useAuth();
 
 	return useMutation({
-		mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
-		onSuccess: (data: LoginResponse) => {
-			queryClient.setQueryData(queryKeys.authUser(), data.user);
+		mutationFn: async (credentials: LoginRequest) => {
+			await login(credentials.email, credentials.password);
+			return { user: queryClient.getQueryData(queryKeys.authUser()) } as LoginResponse;
+		},
+		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.auth() });
+		},
+		onError: (error) => {
+			console.error("Login failed:", error);
 		},
 	});
 };
@@ -53,6 +60,9 @@ export const useRegister = () => {
 			if (data.user) {
 				queryClient.setQueryData(queryKeys.authUser(), data.user);
 			}
+		},
+		onError: (error) => {
+			console.error("Registration failed:", error);
 		},
 	});
 };
@@ -81,9 +91,12 @@ export const useResendVerification = () => {
 // Logout mutation
 export const useLogout = () => {
 	const queryClient = useQueryClient();
+	const { logout } = useAuth();
 
 	return useMutation({
-		mutationFn: (refreshToken: string) => authApi.logout(refreshToken),
+		mutationFn: async () => {
+			await logout();
+		},
 		onSuccess: () => {
 			// Clear all cached data
 			queryClient.clear();

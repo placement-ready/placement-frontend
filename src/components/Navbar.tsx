@@ -29,26 +29,20 @@ import {
 	UserIcon,
 	ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import { useLogout } from "@/lib/queries";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const { data: session } = useSession();
-	const isAuthenticated = !!session?.user;
+	const { user, isAuthenticated, logout } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { mutate: logout } = useLogout();
-	console.log("Session:", session);
 
-	const userImage = session?.user?.image || "/brain.png";
+	const userImage = user?.avatar || "/brain.png";
 
 	const handleSignOut = async () => {
 		try {
-			logout(session?.refreshToken || "");
-			await signOut({ callbackUrl: "/" });
+			await logout.mutate();
 		} catch (error) {
 			console.error("Error signing out:", error);
 		}
@@ -201,14 +195,14 @@ const Navbar = () => {
 											<span className="relative flex items-center">
 												<Image
 													src={userImage}
-													alt={session?.user?.name || "User"}
+													alt={user?.name || "User"}
 													width={32}
 													height={32}
 													className="rounded-full object-cover shadow"
 												/>
 											</span>
 										}
-										label={session?.user?.name || "User"}
+										label={user?.name || "User"}
 										className="flex items-center gap-2 px-4 py-2 hover:text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105"
 									/>
 									<DropdownContent width="w-64" position="right">
@@ -273,19 +267,15 @@ const Navbar = () => {
 								<div className="flex flex-col items-center mb-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
 									<Image
 										src={userImage}
-										alt={session?.user?.name || "User"}
+										alt={user?.name || "User"}
 										width={64}
 										height={64}
 										className="rounded-full object-cover border-3 border-green-500 shadow-lg"
 									/>
-									{session?.user?.name && (
-										<span className="mt-3 text-xl font-bold text-gray-800">
-											{session.user.name}
-										</span>
+									{user?.name && (
+										<span className="mt-3 text-xl font-bold text-gray-800">{user.name}</span>
 									)}
-									{session?.user?.email && (
-										<span className="text-sm text-gray-500 mt-1">{session.user.email}</span>
-									)}
+									{user?.email && <span className="text-sm text-gray-500 mt-1">{user.email}</span>}
 								</div>
 							)}
 

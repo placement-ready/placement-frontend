@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import PasswordForm from "@/components/auth/PasswordForm";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useCheckEmailVerified, useCreateVerificationToken } from "@/lib/queries";
+import { useAuth } from "@/hooks/useAuth";
 
 const LoginPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
@@ -16,6 +16,7 @@ const LoginPassword: React.FC = () => {
 
 	const router = useRouter();
 	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+	const { authLogin } = useAuth();
 
 	// React Query mutation for checking email verification
 	const checkEmailVerification = useCheckEmailVerified(email);
@@ -51,16 +52,13 @@ const LoginPassword: React.FC = () => {
 				}
 				router.push("/auth/email-verification");
 			} else {
-				const res = await signIn("credentials", {
-					email,
-					password,
-					redirect: false,
-				});
-
-				if (res?.ok) {
+				try {
+					await authLogin(email, password);
 					router.push("/profile");
-				} else {
-					setError("Login failed. Please try again.");
+				} catch (loginError: unknown) {
+					const errorMessage =
+						loginError instanceof Error ? loginError.message : "Login failed. Please try again.";
+					setError(errorMessage);
 				}
 			}
 		} catch (error: unknown) {

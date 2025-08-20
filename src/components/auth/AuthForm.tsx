@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { signIn } from "next-auth/react";
 
 interface AuthFormProps {
 	title: string;
@@ -41,7 +40,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
 	const handleGoogleSignIn = async () => {
 		setProcessing(true);
 		try {
-			await signIn("google", { callbackUrl: "/" });
+			// For now, we'll disable Google Sign-In since we removed NextAuth
+			// You can implement this later with your backend
+			console.log("Google Sign-In not implemented yet");
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
 		} finally {

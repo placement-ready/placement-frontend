@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
-	const token = await getToken({
-		req,
-		secret: process.env.AUTH_SECRET,
-	});
+	// Get access token from cookies
+	const accessToken = req.cookies.get("accessToken")?.value;
 
 	// If no token, redirect to login
-	if (!token) {
+	if (!accessToken) {
 		const loginUrl = new URL("/auth/login", req.url);
 		loginUrl.searchParams.set("callbackUrl", req.url);
 		return NextResponse.redirect(loginUrl);
