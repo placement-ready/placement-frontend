@@ -22,7 +22,6 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useGetProfile } from "@/lib/queries/users";
 
-// Types for profile data - extending the base User type for type assertions
 interface ExtendedUser {
 	id: string;
 	email: string;

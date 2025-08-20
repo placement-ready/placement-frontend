@@ -53,15 +53,23 @@ const EmailVerification = () => {
 				code: verificationCode,
 			});
 
-			if (result.success && storedPassword) {
+			// Get password from sessionStorage or state
+			const passwordToUse = storedPassword || sessionStorage.getItem("auth_password");
+
+			if (result.success && passwordToUse) {
 				try {
-					await authLogin(email, storedPassword);
+					await authLogin(email, passwordToUse);
 					clearData();
 					router.push("/profile");
 				} catch (loginError) {
 					console.error("Login after verification failed:", loginError);
 					setError("Email verified, but login failed. Please try logging in again.");
 				}
+			} else if (result.success && !passwordToUse) {
+				// Verification successful but no password stored, redirect to login
+				setError("Email verified successfully! Please log in with your credentials.");
+				clearData();
+				setTimeout(() => router.push("/auth/login"), 2000);
 			}
 		} catch (error: unknown) {
 			console.error("Error verifying code:", error);

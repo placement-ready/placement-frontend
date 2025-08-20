@@ -17,7 +17,7 @@ const CreateAccountPassword: React.FC = () => {
 	const [error, setError] = useState("");
 
 	const router = useRouter();
-	const { email: storedEmail, isLoading: authLoading } = useAuthState();
+	const { email: storedEmail, isLoading: authLoading, setPassword: storePassword } = useAuthState();
 	const { register } = useAuth();
 
 	// React Query mutation for creating verification token
@@ -68,20 +68,16 @@ const CreateAccountPassword: React.FC = () => {
 		setError("");
 
 		try {
+			// Store password in sessionStorage FIRST
+			storePassword(password);
+			sessionStorage.setItem("auth_password", password);
+
 			// Use auth context for registration
 			await register(email, password, email.split("@")[0]); // Use email prefix as default name
 
-			try {
-				// Store password in sessionStorage
-				sessionStorage.setItem("auth_password", password);
-				// Use React Query mutation for creating verification token
-				await createTokenMutation.mutateAsync(email);
-			} catch (error: unknown) {
-				console.error("Error sending email:", error);
-				const errorMessage =
-					error instanceof Error ? error.message : "Failed to send email. Please try again.";
-				setError(errorMessage);
-			}
+			// Use React Query mutation for creating verification token
+			await createTokenMutation.mutateAsync(email);
+
 			router.push("/auth/email-verification");
 		} catch (error: unknown) {
 			console.error("Account creation error:", error);

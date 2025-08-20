@@ -60,12 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	const register = async (email: string, password: string, name: string): Promise<void> => {
 		try {
-			const response = await authApi.register({ email, password, name });
-
-			// Note: For registration, we typically don't auto-login the user
-			// They need to verify their email first
-			// Store the registration response or handle as needed
-			console.log("Registration successful:", response);
+			await authApi.register({ email, password, name });
+			await login(email, password);
 		} catch (error) {
 			console.error("Registration failed:", error);
 			throw error;
@@ -82,7 +78,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					await authApi.logout(refreshToken);
 				} catch (error) {
 					console.error("Backend logout failed:", error);
-					// Continue with local logout even if backend fails
 				}
 			}
 		} finally {

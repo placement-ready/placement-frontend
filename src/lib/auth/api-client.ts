@@ -87,7 +87,7 @@ class ApiClient {
 				return false;
 			}
 
-			const response = await fetch(`${this.baseURL}/auth/refresh`, {
+			const response = await fetch(`${this.baseURL}/auth/refresh-token`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

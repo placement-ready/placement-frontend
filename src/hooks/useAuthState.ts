@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 interface AuthState {
 	email: string | null;
-	password?: string | null; // Added optional password field
+	password?: string | null;
 	isLoading: boolean;
 }
 
@@ -17,8 +17,10 @@ export const useAuthState = () => {
 	// Initialize email from sessionStorage on component mount
 	useEffect(() => {
 		const storedEmail = sessionStorage.getItem(AUTH_EMAIL_KEY);
+		const storedPassword = sessionStorage.getItem("auth_password");
 		setAuthState({
 			email: storedEmail,
+			password: storedPassword,
 			isLoading: false,
 		});
 	}, []);
@@ -29,7 +31,13 @@ export const useAuthState = () => {
 		if (password) {
 			sessionStorage.setItem("auth_password", password);
 		}
-		setAuthState((prev) => ({ ...prev, email, password: password || null }));
+		setAuthState((prev) => ({ ...prev, email, password: password || prev.password }));
+	};
+
+	// Save password separately
+	const setPassword = (password: string) => {
+		sessionStorage.setItem("auth_password", password);
+		setAuthState((prev) => ({ ...prev, password }));
 	};
 
 	// Clear email and password from sessionStorage
@@ -54,6 +62,7 @@ export const useAuthState = () => {
 		password: authState.password, // Expose password in the return object
 		isLoading: authState.isLoading,
 		setEmail,
+		setPassword,
 		clearData,
 		getStoredEmail,
 		getStoredPassword, // Expose getStoredPassword
