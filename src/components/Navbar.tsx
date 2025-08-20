@@ -94,7 +94,7 @@ const Navbar = () => {
 								<span className="font-medium">Learning</span>
 							</a>
 							<a
-								href="#"
+								href="Dsa"
 								className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<ChartBarIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
