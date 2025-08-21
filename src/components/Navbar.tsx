@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
 	DropdownRoot,
 	DropdownTrigger,
@@ -86,27 +87,27 @@ const Navbar = () => {
 
 						{/* Desktop Menu */}
 						<div className="hidden lg:flex items-center space-x-1">
-							<a
-								href="#"
+							<Link
+								href="/"
 								className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<HomeIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-								<span className="font-medium">Learning</span>
-							</a>
-							<a
-								href="Dsa"
+								<span className="font-medium">Home</span>
+							</Link>
+							<Link
+								href="/dashboard/dsa"
 								className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<ChartBarIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
 								<span className="font-medium">Practice</span>
-							</a>
-							<a
-								href="#"
+							</Link>
+							<Link
+								href="/dashboard/study-plan"
 								className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<BookOpenIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
 								<span className="font-medium">Study Plan</span>
-							</a>
+							</Link>
 
 							{/* AI Tools Dropdown */}
 							<DropdownRoot>
@@ -286,14 +287,14 @@ const Navbar = () => {
 										Account
 									</div>
 									<div className="space-y-1">
-										<a
+										<Link
 											href="/dashboard/profile"
 											className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 											onClick={() => setMobileMenuOpen(false)}
 										>
 											<UserIcon className="h-4 w-4" />
 											<span>Profile</span>
-										</a>
+										</Link>
 										<button
 											onClick={() => {
 												setMobileMenuOpen(false);
@@ -309,27 +310,27 @@ const Navbar = () => {
 							)}
 
 							{/* Mobile Navigation Links */}
-							<a
+							<Link
 								href="#"
 								className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<HomeIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
 								<span className="font-medium">Learning App</span>
-							</a>
-							<a
+							</Link>
+							<Link
 								href="#"
 								className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<ChartBarIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
 								<span className="font-medium">Practice</span>
-							</a>
-							<a
+							</Link>
+							<Link
 								href="#"
 								className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<BookOpenIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
 								<span className="font-medium">Study Plan</span>
-							</a>
+							</Link>
 
 							{/* Mobile AI Tools Section */}
 							<div className="py-3">
@@ -337,27 +338,27 @@ const Navbar = () => {
 									AI Tools
 								</div>
 								<div className="space-y-1">
-									<a
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<SparklesIcon className="h-4 w-4" />
 										<span>Resume Builder</span>
-									</a>
-									<a
+									</Link>
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<DocumentTextIcon className="h-4 w-4" />
 										<span>Cover Letter</span>
-									</a>
-									<a
+									</Link>
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<AcademicCapIcon className="h-4 w-4" />
 										<span>Interview Prep</span>
-									</a>
+									</Link>
 								</div>
 							</div>
 
@@ -367,27 +368,27 @@ const Navbar = () => {
 									Job Tools
 								</div>
 								<div className="space-y-1">
-									<a
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<MagnifyingGlassIcon className="h-4 w-4" />
 										<span>Job Search</span>
-									</a>
-									<a
+									</Link>
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<BuildingOfficeIcon className="h-4 w-4" />
 										<span>Company Research</span>
-									</a>
-									<a
+									</Link>
+									<Link
 										href="#"
 										className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200"
 									>
 										<CalendarIcon className="h-4 w-4" />
 										<span>Application Tracker</span>
-									</a>
+									</Link>
 								</div>
 							</div>
 
