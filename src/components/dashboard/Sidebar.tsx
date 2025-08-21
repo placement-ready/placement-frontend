@@ -9,21 +9,21 @@ import {
 	MdBusiness,
 	MdTrackChanges,
 	MdEventNote,
-	MdStarBorder,
 	MdPerson,
 	MdLogout,
 	MdSearch,
 	MdClose,
 	MdMenu,
+	MdBarChart,
 } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 
 const links = [
 	{ name: "Dashboard", icon: MdDashboard, href: "/dashboard" },
+	{ name: "Practice", icon: MdBarChart, href: "/dashboard/dsa" },
 	{ name: "Company Questions", icon: MdBusiness, href: "/dashboard/companies" },
 	{ name: "Interview Practice", icon: MdTrackChanges, href: "/dashboard/practice" },
 	{ name: "Schedule Interview", icon: MdEventNote, href: "/dashboard/interviews" },
-	{ name: "Reviews", icon: MdStarBorder, href: "/dashboard/reviews" },
 	{ name: "Profile", icon: MdPerson, href: "/dashboard/profile" },
 ];
 
