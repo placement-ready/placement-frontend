@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import {
 	BookOpen,
 	ListOrdered,
@@ -96,7 +96,7 @@ const difficulty: DifficultyStats = {
 };
 
 export default function DsaUi() {
-	const router = useRouter();
+	// const router = useRouter();
 	const totalQuestions = dsaTopics.reduce((sum, t) => sum + t.count, 0);
 	const totalCompleted = dsaTopics.reduce((sum, t) => sum + t.completed, 0);
 	const totalPercent = totalQuestions > 0 ? Math.round((totalCompleted / totalQuestions) * 100) : 0;
