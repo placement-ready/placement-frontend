@@ -5,7 +5,9 @@ class ApiClient {
 	private baseURL: string;
 	private refreshPromise: Promise<boolean> | null = null;
 
-	constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api") {
+	constructor(
+		baseURL: string = `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:5000/api"
+	) {
 		this.baseURL = baseURL;
 	}
 
