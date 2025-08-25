@@ -102,7 +102,6 @@ export const StatsCards = () => {
   const dsaDone = useAnimatedNumber(48);
   const dsaTotal = 80;
   const offers = useAnimatedNumber(1);
-  const solvedHard = useAnimatedNumber(14);
   const interviewsGiven = useAnimatedNumber(5);
 
   const interviewTime = new Date(Date.now() + 25 * 3600 * 1000);

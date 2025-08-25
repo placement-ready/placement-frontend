@@ -1,6 +1,8 @@
+import QuickActions from "./QuickActions";
 import Sidebar from "./Sidebar";
 import StatsCards from "./Stats";
 import WelcomeBanner from "./Welcome";
+import NotificationsCommunity from "./Community";
 
 const Dashboard: React.FC = () => {
     return(
@@ -8,6 +10,8 @@ const Dashboard: React.FC = () => {
             <Sidebar />
             <WelcomeBanner />
             <StatsCards />
+            <QuickActions />
+            <NotificationsCommunity />
         </div>
     )
 }

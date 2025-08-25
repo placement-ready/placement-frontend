@@ -10,9 +10,11 @@ export default function Dashboard() {
 }
 =======
 import PerformanceCharts from "./Chart";
+import QuickActions from "./QuickActions";
 import Sidebar from "./Sidebar";
 import StatsCards from "./Stats";
 import WelcomeBanner from "./Welcome";
+import NotificationsCommunity from "./Community";
 
 export default function Dashboard() {
     return (
@@ -26,6 +28,8 @@ export default function Dashboard() {
             <WelcomeBanner />
             <StatsCards /> 
             <PerformanceCharts />
+            <QuickActions />
+            <NotificationsCommunity />
         </div>
     )
 }
