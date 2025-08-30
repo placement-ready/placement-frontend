@@ -24,7 +24,7 @@ const links = [
 	{ name: "Company Questions", icon: MdBusiness, href: "/dashboard/companies" },
 	{ name: "Interview Practice", icon: MdTrackChanges, href: "/dashboard/practice" },
 	{ name: "Schedule Interview", icon: MdEventNote, href: "/dashboard/interviews" },
-	{ name: "Profile", icon: MdPerson, href: "/dashboard/profile" },
+	{ name: "Mentor", icon: MdPerson, href: "/dashboard/Mentor" },
 ];
 
 interface SidebarProps {
