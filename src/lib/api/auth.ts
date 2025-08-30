@@ -25,9 +25,6 @@ export const authApi = {
 	verifyEmail: (data: VerifyEmailRequest) =>
 		api.post<VerifyEmailResponse>("/auth/verify-email", data),
 
-	// Resend verification email
-	resendVerification: (email: string) => api.post("/auth/resend-verification", { email }),
-
 	// Logout user
 	logout: (refreshToken: string) => api.post("/auth/logout", { refreshToken }),
 
