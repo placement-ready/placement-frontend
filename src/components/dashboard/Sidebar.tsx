@@ -7,14 +7,14 @@ import { usePathname } from "next/navigation";
 import {
 	MdDashboard,
 	MdBusiness,
-	MdTrackChanges,
 	MdEventNote,
-	MdPerson,
 	MdLogout,
 	MdSearch,
 	MdClose,
 	MdMenu,
 	MdBarChart,
+	MdOutlineMap,
+	Md3P,
 } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -22,9 +22,9 @@ const links = [
 	{ name: "Dashboard", icon: MdDashboard, href: "/dashboard" },
 	{ name: "Practice", icon: MdBarChart, href: "/dashboard/dsa" },
 	{ name: "Company Questions", icon: MdBusiness, href: "/dashboard/companies" },
-	{ name: "Interview Practice", icon: MdTrackChanges, href: "/dashboard/practice" },
 	{ name: "Schedule Interview", icon: MdEventNote, href: "/dashboard/interviews" },
-	{ name: "Mentor", icon: MdPerson, href: "/dashboard/Mentor" },
+	{ name: "Mentor", icon: Md3P, href: "/dashboard/mentor" },
+	{ name: "Roadmap", icon: MdOutlineMap, href: "/dashboard/roadmap" },
 ];
 
 interface SidebarProps {
@@ -320,7 +320,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 								onClick={() => isMobile && setIsOpen(false)}
 							>
 								<div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-200">
-									<span className="text-white font-bold text-lg">V</span>
+									<span className="text-white font-bold text-lg">
+										{getInitials(user?.name || "User")}
+									</span>
 								</div>
 							</Link>
 							<button
