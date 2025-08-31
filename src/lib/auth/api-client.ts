@@ -1,13 +1,12 @@
 import { tokenManager } from "@/lib/auth/tokens";
+import { AUTH_CONFIG } from "./config";
 
 // API client with automatic token refresh
 class ApiClient {
 	private baseURL: string;
 	private refreshPromise: Promise<boolean> | null = null;
 
-	constructor(
-		baseURL: string = `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:5000/api"
-	) {
+	constructor(baseURL: string = AUTH_CONFIG.API_URL) {
 		this.baseURL = baseURL;
 	}
 

@@ -1,5 +1,5 @@
 // Environment variables for authentication
 export const AUTH_CONFIG = {
-	API_URL: `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:3001/api",
+	API_URL: `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:5000/api",
 	JWT_SECRET: process.env.AUTH_SECRET || "your-secret-key",
 } as const;
