@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+
   MdDashboard,
   MdBusiness,
   MdTrackChanges,
@@ -18,6 +19,8 @@ import {
   MdAutoAwesome,
   MdExpandMore,
   MdExpandLess,
+  Md3P,
+  MdOutlineMap,
 } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -253,7 +256,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
             />
           )}
         </div>
-
         {/* Menu Links */}
         <nav className="w-full flex-1 overflow-y-auto">
           <ul className="list-none m-0 p-0 space-y-2">
@@ -543,6 +545,96 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
       </aside>
     </>
   );
+=======
+				{/* Profile & Logout */}
+				<div className="w-full mt-auto pt-6">
+					{isOpen ? (
+						<div
+							className={`
+								w-full flex items-center justify-between
+								bg-white/90 backdrop-blur-sm rounded-xl shadow-lg
+								px-4 py-4 border border-green-200/50
+								transition-all duration-200
+								hover:shadow-xl hover:bg-white
+							`}
+						>
+							<Link
+								href="/dashboard/profile"
+								className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity duration-200"
+								onClick={() => isMobile && setIsOpen(false)}
+							>
+								{user?.avatar ? (
+									<Image
+										src={user?.avatar}
+										alt="User Avatar"
+										width={40}
+										height={40}
+										className="rounded-full"
+									/>
+								) : (
+									<div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+										<span className="text-white font-bold text-lg">
+											{getInitials(user?.name || "User")}
+										</span>
+									</div>
+								)}
+								<div className="flex flex-col">
+									<span className="text-sm font-semibold text-green-700">
+										{user?.name || "User"}
+									</span>
+									<span className="text-xs text-green-600">{user?.role || "Student"}</span>
+								</div>
+							</Link>
+							<button
+								onClick={handleSignOut}
+								className={`
+									bg-red-50 text-red-500 rounded-xl p-2.5 ml-3
+									shadow-sm border border-red-200/50
+									flex items-center justify-center 
+									hover:bg-red-100 hover:shadow-md
+									transition-all duration-200
+									focus:outline-none focus:ring-2 focus:ring-red-400
+								`}
+								aria-label="Logout"
+								title="Logout"
+							>
+								<MdLogout size={18} />
+							</button>
+						</div>
+					) : (
+						<div className="flex flex-col items-center space-y-4 w-full">
+							<Link
+								href="/dashboard/profile"
+								className="hover:opacity-80 transition-opacity duration-200"
+								onClick={() => isMobile && setIsOpen(false)}
+							>
+								<div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-200">
+									<span className="text-white font-bold text-lg">
+										{getInitials(user?.name || "User")}
+									</span>
+								</div>
+							</Link>
+							<button
+								onClick={handleSignOut}
+								className={`
+									bg-red-50 text-red-500 rounded-xl p-2.5
+									shadow-sm border border-red-200/50
+									flex items-center justify-center 
+									hover:bg-red-100 hover:shadow-md
+									transition-all duration-200
+									focus:outline-none focus:ring-2 focus:ring-red-400
+								`}
+								aria-label="Logout"
+								title="Logout"
+							>
+								<MdLogout size={18} />
+							</button>
+						</div>
+					)}
+				</div>
+			</aside>
+		</>
+	);
 };
 
 export default Sidebar;

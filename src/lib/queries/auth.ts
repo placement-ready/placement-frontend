@@ -81,13 +81,6 @@ export const useVerifyEmail = () => {
 	});
 };
 
-// Resend verification email mutation
-export const useResendVerification = () => {
-	return useMutation({
-		mutationFn: (email: string) => authApi.resendVerification(email),
-	});
-};
-
 // Logout mutation
 export const useLogout = () => {
 	const queryClient = useQueryClient();

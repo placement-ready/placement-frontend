@@ -10,6 +10,10 @@ export const queryKeys = {
 	profile: () => ["users", "profile"] as const,
 	userProfile: (id: string) => ["users", id, "profile"] as const,
 
+	// Mentors
+	mentors: () => ["mentors"] as const,
+	mentor: (id: string) => ["mentors", id] as const,
+
 	// Companies
 	companies: () => ["companies"] as const,
 	company: (id: string) => ["companies", id] as const,
