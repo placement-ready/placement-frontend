@@ -19,81 +19,16 @@ import {
 	ShareIcon,
 	GlobeAltIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth } from "@/hooks/useAuth";
 import { useGetProfile } from "@/lib/queries/users";
-
-interface ExtendedUser {
-	id: string;
-	email: string;
-	name: string;
-	avatar?: string;
-	role: "student" | "admin" | "recruiter";
-	phone?: string;
-	location?: string;
-	title?: string;
-	bio?: string;
-	graduation?: string;
-	resumeLink?: string;
-	education?: Education[];
-	experience?: Experience[];
-	skills?: Skill[];
-	achievements?: Achievement[];
-	projects?: Project[];
-}
-
-interface PersonalInfo {
-	name: string;
-	email: string;
-	phone: string;
-	location: string;
-	avatar: string;
-	title: string;
-	bio: string;
-	graduation: string;
-	resumeLink: string;
-}
-
-interface Education {
-	id?: string;
-	degree: string;
-	institution: string;
-	year: string;
-	grade?: string;
-	specialization?: string;
-}
-
-interface Experience {
-	id?: string;
-	title: string;
-	company: string;
-	duration: string;
-	description: string;
-	type: "internship" | "job" | "project";
-}
-
-interface Skill {
-	id?: string;
-	name: string;
-	level: number;
-	category: "technical" | "soft" | "language";
-}
-
-interface Achievement {
-	id?: string;
-	title: string;
-	description: string;
-	date: string;
-	type: "academic" | "technical" | "extracurricular";
-}
-
-interface Project {
-	id?: string;
-	name: string;
-	description: string;
-	technologies?: string[];
-	link?: string;
-	github?: string;
-}
+import {
+	ExtendedUser,
+	PersonalInfo,
+	Education,
+	Experience,
+	Skill,
+	Project,
+	Achievement,
+} from "@/types/profile";
 
 // Loading skeleton component
 const ProfileSkeleton = () => (
@@ -508,36 +443,12 @@ const Profile: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<string>("overview");
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 
-	// Get authenticated user data
-	const { user, isAuthenticated } = useAuth();
-
 	// Fetch user profile data if we have a user ID
 	const { data: userProfile, isLoading: isLoadingProfile, error: profileError } = useGetProfile();
 
 	// Determine loading and error states
 	const isLoading = isLoadingProfile;
 	const error = profileError;
-
-	// Redirect to login if not authenticated
-	if (!isAuthenticated) {
-		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="text-center">
-					<div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-						<UserIcon className="w-8 h-8 text-blue-600" />
-					</div>
-					<h2 className="text-xl font-semibold text-gray-900 mb-2">Please Log In</h2>
-					<p className="text-gray-600 mb-4">You need to be logged in to view your profile.</p>
-					<a
-						href="/auth/login"
-						className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-					>
-						Go to Login
-					</a>
-				</div>
-			</div>
-		);
-	}
 
 	// Show loading state
 	if (isLoading) {
@@ -552,11 +463,10 @@ const Profile: React.FC = () => {
 	// Transform API data with type assertion for extended properties
 	const extendedUserProfile = userProfile as ExtendedUser;
 
-	// Merge data from different sources
 	const profileData = {
 		personalInfo: {
-			name: extendedUserProfile?.name || user?.name || "User Name",
-			email: extendedUserProfile?.email || user?.email || "user@example.com",
+			name: extendedUserProfile?.name || "User Name",
+			email: extendedUserProfile?.email || "user@example.com",
 			phone: extendedUserProfile?.phone || "+1 (555) 123-4567",
 			location: extendedUserProfile?.location || "San Francisco, CA",
 			avatar: extendedUserProfile?.avatar || "/brain.png",
@@ -567,8 +477,6 @@ const Profile: React.FC = () => {
 			graduation: extendedUserProfile?.graduation || "May 2024",
 			resumeLink: extendedUserProfile?.resumeLink || "/resume.pdf",
 		},
-		// For now, we'll use fallback data for sections not in the API
-		// In a real app, these would come from the API response
 		education: extendedUserProfile?.education || [],
 		experience: extendedUserProfile?.experience || [],
 		skills: extendedUserProfile?.skills || [],
