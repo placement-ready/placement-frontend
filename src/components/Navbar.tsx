@@ -102,7 +102,7 @@ const Navbar = () => {
 								<span className="font-medium">Practice</span>
 							</Link>
 							<Link
-								href="/dashboard/study-plan"
+								href="/dashboard/studyPlan"
 								className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-700 hover:text-green-600 hover:bg-green-50/80 transition-all duration-200 group"
 							>
 								<BookOpenIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
@@ -122,7 +122,7 @@ const Navbar = () => {
 											icon={<SparklesIcon className="h-5 w-5" />}
 											label="Resume Builder"
 											description="AI-powered resume creation"
-											href="#"
+											href="/dashboard/resume"
 										/>
 										<DropdownItem
 											icon={<DocumentTextIcon className="h-5 w-5" />}
