@@ -4,8 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MdLogout, MdExpandMore, MdExpandLess } from "react-icons/md";
-import { RiMenuFold4Line, RiMenuUnfold4Line } from "react-icons/ri";
+import { MdLogout, MdChevronRight } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarMenuItem {
@@ -32,11 +31,12 @@ interface SidebarConfig {
 
 interface SidebarProps {
 	config: SidebarConfig;
+	isOpen: boolean;
+	setIsOpen: (open: boolean) => void;
 	className?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
-	const [isOpen, setIsOpen] = useState(false);
+const Sidebar: React.FC<SidebarProps> = ({ config, isOpen, setIsOpen, className = "" }) => {
 	const [isMobile, setIsMobile] = useState(false);
 	const [expandedDropdowns, setExpandedDropdowns] = useState<Set<string>>(new Set());
 	const pathname = usePathname();
@@ -47,17 +47,13 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 		const handleResize = () => {
 			const mobile = window.innerWidth < 1024;
 			setIsMobile(mobile);
-			if (!mobile) {
-				setIsOpen(true);
-			} else {
-				setIsOpen(false);
-			}
+			if (mobile) setIsOpen(false);
 		};
 
 		handleResize();
 		window.addEventListener("resize", handleResize);
 		return () => window.removeEventListener("resize", handleResize);
-	}, []);
+	}, [setIsOpen]);
 
 	// Close sidebar on mobile when clicking outside
 	useEffect(() => {
@@ -72,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, [isMobile, isOpen]);
+	}, [isMobile, isOpen, setIsOpen]);
 
 	const handleSignOut = async () => {
 		try {
@@ -127,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 							${indentClass}
 						`}
 					>
-						<div className="flex items-center gap-4">
+						<div className={`flex items-center ${isOpen ? "gap-4" : "gap-0"} `}>
 							<span className="text-xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
 								{item.icon}
 							</span>
@@ -149,12 +145,16 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 						</div>
 						{isOpen && (
 							<span className="text-lg transition-transform duration-200">
-								{isExpanded ? <MdExpandLess /> : <MdExpandMore />}
+								<MdChevronRight
+									className={`transform transition-transform duration-200 ${
+										isExpanded ? "rotate-90" : ""
+									}`}
+								/>
 							</span>
 						)}
 					</button>
-					{isExpanded && isOpen && item.children && (
-						<ul className="mt-2 space-y-1">
+					{isExpanded && item.children && (
+						<ul className={`mt-2 space-y-1 ${isOpen ? "px-2" : "px-0"} `}>
 							{item.children.map((child) => renderMenuItem(child, depth + 1))}
 						</ul>
 					)}
@@ -249,58 +249,26 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 				/>
 			)}
 
-			{/* Mobile Toggle Button */}
-			{isMobile && (
-				<button
-					className="fixed top-4 left-4 z-50 lg:hidden bg-white/90 backdrop-blur-sm text-green-600 rounded-lg w-12 h-12 shadow-lg flex items-center justify-center hover:bg-white transition-all duration-200"
-					onClick={() => setIsOpen(!isOpen)}
-					aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
-				>
-					{isOpen ? <RiMenuUnfold4Line size={24} /> : <RiMenuFold4Line size={24} />}
-				</button>
-			)}
-
 			<aside
 				id="sidebar"
 				className={`
-					${isMobile ? "fixed" : "sticky"} 
-					${isMobile ? "top-0 left-0 h-screen" : "top-0 h-screen"}
 					${isOpen ? "w-64" : isMobile ? "w-0" : "w-16"}
 					${isMobile && !isOpen ? "overflow-hidden" : ""}
+					${isMobile ? "fixed" : "sticky"}
 					transition-all duration-300 ease-out
 					bg-gradient-to-br from-green-50 via-green-100 to-green-200
 					backdrop-blur-sm border-r border-green-200/50
 					shadow-xl shadow-green-500/10
-					flex flex-col
-					${isOpen ? "items-start" : "items-center"}
-					${isOpen ? "px-5 py-6" : "px-2 py-6"}
+					flex flex-col top-0 left-0 h-screen py-4 px-0
+					${isOpen ? "items-start px-4" : "items-center md:px-2"}
 					z-40
 					${className}
 				`}
 			>
-				{/* Desktop Collapse/Expand Button */}
-				{!isMobile && (
-					<button
-						className={`
-							absolute top-6 ${isOpen ? "right-5" : "right-2"}
-							bg-white/90 backdrop-blur-sm text-green-600
-							rounded-lg w-10 h-10 shadow-sm
-							flex items-center justify-center z-20
-							hover:bg-white hover:shadow-lg hover:shadow-green-200/30
-							transition-all duration-200 focus:outline-none
-						`}
-						onClick={() => setIsOpen(!isOpen)}
-						aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-					>
-						{isOpen ? <RiMenuUnfold4Line size={22} /> : <RiMenuFold4Line size={22} />}
-					</button>
-				)}
-
 				{/* Logo & App Name */}
 				<div
 					className={`
-						flex items-center gap-3
-						${isOpen ? "mb-8" : "mb-6"} ${isMobile ? "mt-16" : "mt-2"} w-full
+						flex items-center gap-3 mb-8 w-full
 						${isOpen ? "justify-start" : "justify-center"}
 						transition-all duration-300
 					`}
@@ -324,7 +292,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 					<span
 						className={`
 							font-extrabold text-green-700 text-xl tracking-tight
-							${isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}
+							${isOpen ? "inline" : "hidden"}
 							transition-all duration-300
 						`}
 					>
@@ -333,8 +301,8 @@ const Sidebar: React.FC<SidebarProps> = ({ config, className = "" }) => {
 				</div>
 
 				{/* Menu Links */}
-				<nav className="w-full flex-1 overflow-y-auto">
-					<ul className="list-none m-0 p-0 space-y-2">
+				<nav className="w-full flex-1 overflow-y-auto overflow-x-hidden scrollbar-hidden">
+					<ul className="list-none m-0 p-0.5 space-y-2">
 						{config.menuItems.map((item) => renderMenuItem(item))}
 					</ul>
 				</nav>

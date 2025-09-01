@@ -12,6 +12,11 @@ import {
 	MdHelp,
 	MdAutoFixHigh,
 	MdFileOpen,
+	MdVerifiedUser,
+	MdQuestionMark,
+	MdAddChart,
+	MdFileCopy,
+	MdBook,
 } from "react-icons/md";
 import { SidebarConfig } from "./Sidebar";
 
@@ -32,6 +37,13 @@ const menuItems: SidebarConfig = {
 			type: "link",
 		},
 		{
+			id: "interviews",
+			name: "Schedule Interview",
+			icon: <MdEventNote />,
+			href: "/dashboard/interviews",
+			type: "link",
+		},
+		{
 			id: "practice",
 			name: "Practice",
 			icon: <MdBarChart />,
@@ -40,7 +52,7 @@ const menuItems: SidebarConfig = {
 				{
 					id: "dsa",
 					name: "DSA Problems",
-					icon: <MdBarChart />,
+					icon: <MdQuestionMark />,
 					href: "/dashboard/dsa",
 					type: "link",
 					badge: "150+",
@@ -71,7 +83,7 @@ const menuItems: SidebarConfig = {
 				{
 					id: "company-questions",
 					name: "Company Questions",
-					icon: <MdBusiness />,
+					icon: <MdAddChart />,
 					href: "/dashboard/companies",
 					type: "link",
 				},
@@ -83,13 +95,6 @@ const menuItems: SidebarConfig = {
 					type: "link",
 				},
 			],
-		},
-		{
-			id: "interviews",
-			name: "Schedule Interview",
-			icon: <MdEventNote />,
-			href: "/dashboard/interviews",
-			type: "link",
 		},
 		{
 			id: "aiFeatures",
@@ -129,14 +134,14 @@ const menuItems: SidebarConfig = {
 				{
 					id: "templates",
 					name: "Resume Templates",
-					icon: <MdSchool />,
+					icon: <MdFileCopy />,
 					href: "/dashboard/templates",
 					type: "link",
 				},
 				{
 					id: "study-materials",
 					name: "Study Materials",
-					icon: <MdSchool />,
+					icon: <MdBook />,
 					href: "/dashboard/materials",
 					type: "link",
 				},
@@ -151,7 +156,7 @@ const menuItems: SidebarConfig = {
 				{
 					id: "profile-settings",
 					name: "Profile Settings",
-					icon: <MdSettings />,
+					icon: <MdVerifiedUser />,
 					href: "/dashboard/settings/profile",
 					type: "link",
 				},

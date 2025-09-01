@@ -1,5 +1,4 @@
-import Sidebar from "@/components/dashboard/Sidebar";
-import menuItems from "@/components/dashboard/MenuItems";
+import Layout from "@/components/dashboard/DashboardLayout";
 
 export default function DashboardLayout({
 	children,
@@ -8,8 +7,7 @@ export default function DashboardLayout({
 }>) {
 	return (
 		<div className="flex min-h-screen bg-green-50 font-sans">
-			<Sidebar config={menuItems} />
-			<div className="flex-1">{children}</div>
+			<Layout>{children}</Layout>
 		</div>
 	);
 }
