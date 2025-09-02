@@ -135,7 +135,7 @@ const menuItems: SidebarConfig = {
 					id: "templates",
 					name: "Resume Templates",
 					icon: <MdFileCopy />,
-					href: "/dashboard/templates",
+					href: "/dashboard/resume/templates",
 					type: "link",
 				},
 				{

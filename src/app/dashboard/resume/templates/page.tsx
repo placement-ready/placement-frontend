@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
 
@@ -34,6 +35,7 @@ export default function TemplatesPage() {
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState<"All" | "Professional" | "Creative" | "Simple">("All");
 	const [sort, setSort] = useState<"az" | "za">("az");
+	const router = useRouter();
 
 	const filteredTemplates = templates
 		.filter((template) => template.name.toLowerCase().includes(search.toLowerCase()))
@@ -179,7 +181,10 @@ export default function TemplatesPage() {
 											{template.category} Template
 										</p>
 
-										<button className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold group-hover:shadow-green-500/25">
+										<button
+											onClick={() => router.push("/dashboard/resume/create")}
+											className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold group-hover:shadow-green-500/25"
+										>
 											<span className="flex items-center justify-center gap-2">
 												<svg
 													className="w-4 h-4"

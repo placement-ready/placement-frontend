@@ -155,7 +155,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, isOpen, setIsOpen, className 
 					</button>
 					{isExpanded && item.children && (
 						<ul className={`mt-2 space-y-1 ${isOpen ? "px-2" : "px-0"} `}>
-							{item.children.map((child) => renderMenuItem(child, depth + 1))}
+							{item.children.map((child) => renderMenuItem(child))}
 						</ul>
 					)}
 				</li>
