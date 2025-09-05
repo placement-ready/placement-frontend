@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MdLogout, MdChevronRight } from "react-icons/md";
+import { MdLogout } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarMenuItem {
@@ -12,7 +12,7 @@ interface SidebarMenuItem {
 	name: string;
 	icon: React.ReactElement;
 	href?: string;
-	type: "link" | "dropdown";
+	type: "link" | "heading";
 	children?: SidebarMenuItem[];
 	badge?: string | number;
 	onClick?: () => void;
@@ -38,7 +38,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ config, isOpen, setIsOpen, className = "" }) => {
 	const [isMobile, setIsMobile] = useState(false);
-	const [expandedDropdowns, setExpandedDropdowns] = useState<Set<string>>(new Set());
 	const pathname = usePathname();
 	const { user, logout } = useAuth();
 
@@ -93,74 +92,34 @@ const Sidebar: React.FC<SidebarProps> = ({ config, isOpen, setIsOpen, className 
 		return names[0].charAt(0).toLocaleUpperCase();
 	};
 
-	const toggleDropdown = (itemId: string) => {
-		const newExpanded = new Set(expandedDropdowns);
-		if (newExpanded.has(itemId)) {
-			newExpanded.delete(itemId);
-		} else {
-			newExpanded.add(itemId);
-		}
-		setExpandedDropdowns(newExpanded);
-	};
-
 	const renderMenuItem = (item: SidebarMenuItem, depth: number = 0) => {
-		const isExpanded = expandedDropdowns.has(item.id);
 		const isActive = item.href ? isActiveLink(item.href) : false;
 		const hasChildren = item.children && item.children.length > 0;
 		const indentClass = depth > 0 ? `ml-${depth * 4}` : "";
 
-		if (item.type === "dropdown" && hasChildren) {
+		if (item.type === "heading" && hasChildren && isOpen) {
 			return (
 				<li key={item.id} className="w-full">
-					<button
-						onClick={() => toggleDropdown(item.id)}
-						className={`
-							flex items-center ${isOpen ? "gap-4 px-4" : "gap-0 px-0"} 
-							py-3 w-full rounded-xl
-							${isOpen ? "justify-between" : "justify-center"}
-							group transition-all duration-200
-							focus:outline-none bg-white/50 backdrop-blur-sm text-green-700 hover:bg-white/80 hover:text-green-600 hover:shadow-md border border-green-200/30
-							${indentClass}
-						`}
-					>
-						<div className={`flex items-center ${isOpen ? "gap-4" : "gap-0"} `}>
-							<span className="text-xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
-								{item.icon}
-							</span>
-							<span
-								className={`
-									text-sm font-medium truncate
-									${isOpen ? "opacity-100 max-w-xs" : "opacity-0 max-w-0"}
-									transition-all duration-300
-									overflow-hidden
-								`}
-							>
+					<div className={`mb-2 mt-4 ${indentClass}`}>
+						<div className="flex items-center gap-3 px-4 py-2">
+							<span className="text-lg text-green-600 flex-shrink-0">{item.icon}</span>
+							<span className="text-sm font-bold text-green-700 uppercase tracking-wide">
 								{item.name}
 							</span>
-							{item.badge && isOpen && (
-								<span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-									{item.badge}
-								</span>
-							)}
 						</div>
-						{isOpen && (
-							<span className="text-lg transition-transform duration-200">
-								<MdChevronRight
-									className={`transform transition-transform duration-200 ${
-										isExpanded ? "rotate-90" : ""
-									}`}
-								/>
-							</span>
-						)}
-					</button>
-					{isExpanded && item.children && (
-						<ul className={`mt-2 space-y-1 ${isOpen ? "px-2" : "px-0"} `}>
-							{item.children.map((child) => renderMenuItem(child))}
-						</ul>
-					)}
+						<div className="h-px bg-green-200/50 mx-4"></div>
+					</div>
+					<ul className="space-y-1 mb-4">
+						{item.children?.map((child) => renderMenuItem(child, depth + 1))}
+					</ul>
 				</li>
 			);
 		}
+
+		// Don't render heading when sidebar is collapsed
+		// if (item.type === "heading" && !isOpen) {
+		// 	return null;
+		// }
 
 		// Regular link item
 		const content = (
