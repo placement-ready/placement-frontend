@@ -17,15 +17,16 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only redirect after auth loading is complete
+    if (!isLoading && !isAuthenticated) {
       router.replace('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -54,6 +55,23 @@ export default function Layout({ children }: LayoutProps) {
     const current = segments[segments.length - 1] || 'dashboard';
     return current.charAt(0).toUpperCase() + current.slice(1).replace(/-/g, ' ');
   };
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <>

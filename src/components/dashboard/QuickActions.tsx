@@ -27,7 +27,7 @@ const actionItems: ActionItem[] = [
   {
     title: 'Build Resume',
     description: 'Update your resume with guided prompts and an instant preview.',
-    href: '/resume',
+    href: '/dashboard/resume',
     icon: FileText,
   },
 ];

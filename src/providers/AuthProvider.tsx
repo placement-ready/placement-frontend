@@ -10,6 +10,7 @@ interface AuthContextValue {
   session: SessionData | null;
   user: User | null | undefined;
   isAuthenticated: boolean;
+  isLoading: boolean;
   error: unknown;
   refreshSession: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -18,7 +19,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { data: session, error, refetch } = authClient.useSession();
+  const { data: session, error, isPending, refetch } = authClient.useSession();
 
   const refreshSession = useCallback(async () => {
     if (typeof refetch === 'function') {
@@ -36,11 +37,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       session: session,
       user: session?.user,
       isAuthenticated: !!session,
+      isLoading: isPending,
       error: error ?? null,
       refreshSession,
       signOut,
     }),
-    [session, error, refreshSession, signOut],
+    [session, error, isPending, refreshSession, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

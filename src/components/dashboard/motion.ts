@@ -40,6 +40,19 @@ export const fadeInUp: Variants = {
   },
 };
 
+export const fadeIn: Variants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.4,
+      ease: 'easeOut',
+    },
+  },
+};
+
 export const subtleListItem: Variants = {
   hidden: {
     opacity: 0,
