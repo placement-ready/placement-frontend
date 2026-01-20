@@ -66,7 +66,7 @@ const Hero = () => {
             whileHover="hover"
             whileTap="tap"
             variant="outline"
-            onClick={() => router.push('/resume')}
+            onClick={() => router.push('/dashboard/resume-builder')}
             className="h-12 px-6"
           >
             See resume builder

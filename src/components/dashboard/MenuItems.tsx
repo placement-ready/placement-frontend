@@ -73,10 +73,10 @@ const menuItems: SidebarConfig = {
       type: 'heading',
       children: [
         {
-          id: 'schedule-interview',
-          name: 'Schedule Interview',
+          id: 'new-interview',
+          name: 'AI Interview',
           icon: <Clock />,
-          href: '/dashboard/interview/schedule',
+          href: '/dashboard/interview/new',
           type: 'link',
         },
         {
@@ -105,7 +105,7 @@ const menuItems: SidebarConfig = {
           id: 'builder',
           name: 'Open Builder',
           icon: <User />,
-          href: '/resume',
+          href: '/dashboard/resume-builder',
           type: 'link',
         },
       ],

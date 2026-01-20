@@ -110,7 +110,7 @@ const ResumeStatus = () => {
               </p>
             </div>
             <Button asChild size="sm">
-              <Link href="/resume">
+              <Link href="/dashboard/resume-builder" className="flex items-center">
                 Continue editing
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -118,7 +118,7 @@ const ResumeStatus = () => {
           </DashboardCardFooter>
         </>
       ) : (
-        <NoResumeState actionHref="/resume" />
+        <NoResumeState actionHref="/dashboard/resume-builder" />
       )}
     </DashboardCard>
   );

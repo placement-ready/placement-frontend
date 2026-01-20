@@ -3,33 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Send,
-  ChevronRight,
-  Check,
-  Loader2,
-  Wifi,
-  WifiOff,
-  Trophy,
-  Target,
-  Lightbulb,
-} from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Send,
-  ChevronRight,
-  Check,
-  Loader2,
-  Wifi,
-  WifiOff,
-  Trophy,
-  Target,
-  Lightbulb,
-} from 'lucide-react';
+import { Send, ChevronRight, Check, Loader2, Wifi, WifiOff, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InterviewProvider, useInterview, type Message } from '@/providers/InterviewProvider';
+import { api } from '@/lib/api';
 
 // Message bubble component
 function MessageBubble({ message }: { message: Message }) {
@@ -91,96 +68,6 @@ function TypingIndicator() {
   );
 }
 
-// Results panel
-function ResultsPanel() {
-  const { result } = useInterview();
-  const router = useRouter();
-
-  if (!result) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-card p-8"
-    >
-      <div className="text-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.2 }}
-          className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/20"
-        >
-          <Trophy className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
-        </motion.div>
-        <h2 className="text-2xl font-bold text-foreground">Interview Complete!</h2>
-        <div className="mt-2 flex items-center justify-center gap-2">
-          <span className="text-muted-foreground">Your Score:</span>
-          <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-            {result.score}%
-          </span>
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
-          <div className="mb-2 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-            <Trophy className="h-4 w-4" />
-            <span className="text-sm font-semibold">Strengths</span>
-          </div>
-          <ul className="space-y-1">
-            {result.feedback.strengths.map((s, i) => (
-              <li key={i} className="text-xs text-foreground/80">
-                • {s}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="rounded-xl bg-amber-50 p-4 dark:bg-amber-500/10">
-          <div className="mb-2 flex items-center gap-2 text-amber-600 dark:text-amber-400">
-            <Target className="h-4 w-4" />
-            <span className="text-sm font-semibold">Improvements</span>
-          </div>
-          <ul className="space-y-1">
-            {result.feedback.improvements.map((s, i) => (
-              <li key={i} className="text-xs text-foreground/80">
-                • {s}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="rounded-xl bg-blue-50 p-4 dark:bg-blue-500/10">
-          <div className="mb-2 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-            <Lightbulb className="h-4 w-4" />
-            <span className="text-sm font-semibold">Tips</span>
-          </div>
-          <ul className="space-y-1">
-            {result.feedback.tips.map((s, i) => (
-              <li key={i} className="text-xs text-foreground/80">
-                • {s}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap justify-center gap-3 pt-4">
-        <Button variant="outline" onClick={() => router.push('/dashboard')}>
-          Back to Dashboard
-        </Button>
-        <Button
-          className="bg-emerald-600 text-white hover:bg-emerald-500"
-          onClick={() => router.push('/dashboard/interview/schedule')}
-        >
-          Practice Again
-        </Button>
-      </div>
-    </motion.div>
-  );
-}
-
 // Main interview room content
 function InterviewRoomContent() {
   const {
@@ -205,6 +92,9 @@ function InterviewRoomContent() {
   const sessionId = searchParams.get('session');
 
   const [inputValue, setInputValue] = useState('');
+  const [hasAnsweredCurrent, setHasAnsweredCurrent] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -220,11 +110,23 @@ function InterviewRoomContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Reset hasAnsweredCurrent when question changes
+  useEffect(() => {
+    if (session) {
+      setHasAnsweredCurrent(answeredQuestions.has(session.currentQuestionIndex));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.currentQuestionIndex, answeredQuestions]);
+
   // Handle send message
   const handleSend = () => {
     if (!inputValue.trim() || isSending) return;
     sendMessage(inputValue);
     setInputValue('');
+    setHasAnsweredCurrent(true);
+    if (session) {
+      setAnsweredQuestions((prev) => new Set(prev).add(session.currentQuestionIndex));
+    }
     inputRef.current?.focus();
   };
 
@@ -233,6 +135,34 @@ function InterviewRoomContent() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  // Handle next question
+  const handleNextQuestion = () => {
+    if (!hasAnsweredCurrent) return;
+    nextQuestion();
+  };
+
+  // Handle complete and evaluate
+  const handleComplete = async () => {
+    if (!sessionId) return;
+
+    setIsEvaluating(true);
+
+    try {
+      // First complete the interview via socket
+      completeInterview();
+
+      // Then call evaluate API
+      await api.post(`/interviews/${sessionId}/evaluate`);
+
+      // Redirect to result page
+      router.push(`/dashboard/interview/result/${sessionId}`);
+    } catch (err) {
+      console.error('Error evaluating interview:', err);
+      // Still redirect even if evaluation fails
+      router.push(`/dashboard/interview/result/${sessionId}`);
     }
   };
 
@@ -245,9 +175,7 @@ function InterviewRoomContent() {
         </div>
         <h2 className="text-xl font-semibold text-foreground">Connection Error</h2>
         <p className="text-muted-foreground">{error}</p>
-        <Button onClick={() => router.push('/dashboard/interview/schedule')}>
-          Back to Schedule
-        </Button>
+        <Button onClick={() => router.push('/dashboard/interview/new')}>Start New Interview</Button>
       </div>
     );
   }
@@ -262,10 +190,26 @@ function InterviewRoomContent() {
     );
   }
 
-  // Show results if completed
-  if (result) {
-    return <ResultsPanel />;
+  // Show evaluating state
+  if (isEvaluating || result) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+        >
+          <Loader2 className="h-12 w-12 text-emerald-500" />
+        </motion.div>
+        <h2 className="text-xl font-semibold text-foreground">Evaluating Your Performance...</h2>
+        <p className="text-muted-foreground">
+          Our AI is analyzing your responses and generating detailed feedback
+        </p>
+      </div>
+    );
   }
+
+  const totalQuestions = session.questions.length;
+  const currentQuestionNumber = session.currentQuestionIndex + 1;
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -275,7 +219,7 @@ function InterviewRoomContent() {
           <div>
             <h1 className="text-lg font-semibold text-foreground">{session.title}</h1>
             <p className="text-sm text-muted-foreground">
-              Question {session.currentQuestionIndex + 1} of {session.questions.length}
+              Question {currentQuestionNumber} of {totalQuestions}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -294,13 +238,34 @@ function InterviewRoomContent() {
 
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
             <motion.div
               className="h-full bg-emerald-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
             />
+          </div>
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>{answeredQuestions.size} answered</span>
+            <span>{totalQuestions - answeredQuestions.size} remaining</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Current Question Card */}
+      <div className="border-b border-border bg-linear-to-r from-emerald-50 to-teal-50 px-4 py-4 dark:from-emerald-500/10 dark:to-teal-500/10">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
+              {currentQuestionNumber}
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                Current Question
+              </p>
+              <p className="mt-1 text-base font-medium text-foreground">{currentQuestion}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -323,12 +288,6 @@ function InterviewRoomContent() {
       {/* Input Area */}
       <div className="border-t border-border bg-card/50 p-4">
         <div className="mx-auto max-w-3xl">
-          {/* Current question reminder */}
-          <div className="mb-3 rounded-lg bg-muted/50 px-3 py-2">
-            <p className="text-xs font-medium text-muted-foreground">Current Question:</p>
-            <p className="text-sm text-foreground">{currentQuestion}</p>
-          </div>
-
           <div className="flex gap-2">
             <div className="relative flex-1">
               <textarea
@@ -336,8 +295,12 @@ function InterviewRoomContent() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your response..."
-                rows={2}
+                placeholder={
+                  hasAnsweredCurrent
+                    ? 'Add more to your answer or proceed to next question...'
+                    : 'Type your answer to the question above...'
+                }
+                rows={3}
                 className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 pr-12 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                 disabled={isSending}
               />
@@ -356,28 +319,49 @@ function InterviewRoomContent() {
           </div>
 
           {/* Action buttons */}
-          <div className="mt-3 flex flex-wrap gap-2">
-            {!isLastQuestion ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={nextQuestion}
-                disabled={messages.length < 2}
-              >
-                Next Question
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                onClick={completeInterview}
-                className="bg-emerald-600 text-white hover:bg-emerald-500"
-              >
-                Complete Interview
-                <Check className="ml-1 h-4 w-4" />
-              </Button>
-            )}
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <MessageSquare className="h-4 w-4" />
+              <span>{messages.filter((m) => m.role === 'user').length} responses</span>
+            </div>
+
+            <div className="flex gap-2">
+              {!isLastQuestion ? (
+                <Button
+                  onClick={handleNextQuestion}
+                  disabled={!hasAnsweredCurrent}
+                  className="bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
+                >
+                  Next Question
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleComplete}
+                  disabled={!hasAnsweredCurrent || isEvaluating}
+                  className="bg-linear-to-r from-emerald-600 to-teal-500 text-white hover:shadow-lg"
+                >
+                  {isEvaluating ? (
+                    <>
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      Evaluating...
+                    </>
+                  ) : (
+                    <>
+                      Complete Interview
+                      <Check className="ml-1 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
+
+          {!hasAnsweredCurrent && (
+            <p className="mt-2 text-center text-xs text-amber-600 dark:text-amber-400">
+              Please answer the current question before proceeding
+            </p>
+          )}
         </div>
       </div>
     </div>
