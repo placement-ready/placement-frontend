@@ -3,7 +3,15 @@
 import type { ComponentType, SVGProps } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, FileText, LayoutDashboard, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  FileText,
+  LayoutDashboard,
+  Sparkles,
+  Bookmark,
+  Users,
+  ClipboardList,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { DashboardCard, DashboardCardSection } from './DashboardCard';
@@ -38,6 +46,24 @@ const secondaryActions: ActionItem[] = [
     description: 'Track recent interview performance and spot areas to refine.',
     href: '/dashboard/analytics',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Saved Resources',
+    description: 'Access your bookmarked articles, videos, and practice questions.',
+    href: '/dashboard/resources/saved',
+    icon: Bookmark,
+  },
+  {
+    title: 'Manage Profile',
+    description: 'Update your personal info, preferences, and account settings.',
+    href: '/dashboard/profile',
+    icon: Users,
+  },
+  {
+    title: 'More Actions',
+    description: 'Explore additional tools and features to boost your preparation.',
+    href: '/dashboard/quick-actions',
+    icon: ClipboardList,
   },
 ];
 
@@ -89,7 +115,7 @@ const QuickActions = () => (
           <span>Need a refresher first?</span>
         </div>
         <Button asChild variant="outline" size="sm">
-          <Link href="/dashboard/resources">Explore guidance</Link>
+          <Link href="/dashboard/resources">Explore resources</Link>
         </Button>
       </div>
 

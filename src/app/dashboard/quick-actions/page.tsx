@@ -9,10 +9,8 @@ import {
   MessageCircle,
   BarChart3,
   Bookmark,
-  Code2,
   Users,
   Library,
-  ClipboardList,
   TrendingUp,
   GraduationCap,
   Briefcase,
@@ -91,20 +89,11 @@ const quickActions: QuickAction[] = [
     color: 'bg-pink-50 text-pink-600 border-pink-200 hover:bg-pink-100',
   },
   {
-    id: 'coding-practice',
-    title: 'Practice Coding',
-    description: 'Solve coding problems and improve your programming skills',
-    icon: <Code2 className="w-6 h-6" />,
-    href: '/dashboard/dsa',
-    category: 'learning',
-    color: 'bg-cyan-50 text-cyan-600 border-cyan-200 hover:bg-cyan-100',
-  },
-  {
     id: 'mock-interview',
     title: 'Mock Interview',
     description: 'Practice interviews with AI or connect with mentors',
     icon: <Video className="w-6 h-6" />,
-    href: '/dashboard/mentor',
+    href: '/dashboard/interview/new',
     category: 'career',
     color: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
   },
@@ -166,58 +155,6 @@ const QuickActionsPage: React.FC = () => {
             Fast-track your learning journey with these essential actions. Get started with the most
             important tasks to advance your career and skills.
           </p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <ClipboardList className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Available Actions</p>
-                <p className="text-2xl font-bold text-gray-900">{quickActions.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Categories</p>
-                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Trophy className="w-6 h-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">New Features</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {quickActions.filter((action) => action.badge === 'New').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Bookmark className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Popular</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {quickActions.filter((action) => action.badge === 'Popular').length}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Actions by Category */}

@@ -146,6 +146,44 @@ export default function InterviewResultPage() {
     );
   }
 
+  // Handle pending evaluation or completed but not yet evaluated
+  if (
+    interview.status === 'pending-evaluation' ||
+    (interview.status === 'completed' && !interview.evaluation)
+  ) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 px-4 py-12 text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring' }}
+          className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20"
+        >
+          <Loader2 className="h-12 w-12 animate-spin text-amber-600 dark:text-amber-400" />
+        </motion.div>
+        <h1 className="text-2xl font-bold text-foreground">AI Evaluation in Progress</h1>
+        <p className="text-muted-foreground">
+          Our AI is analyzing your interview responses. This may take a few moments. Your detailed
+          feedback and score will appear here once the evaluation is complete.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          You can leave this page and come back later. We&apos;ll save your results.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3 pt-4">
+          <Button variant="outline" onClick={() => router.push('/dashboard')}>
+            Back to Dashboard
+          </Button>
+          <Button
+            onClick={() => loadInterview()}
+            className="bg-emerald-600 text-white hover:bg-emerald-500"
+          >
+            Refresh Status
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const evaluation = interview.evaluation;
   const score = interview.score || evaluation?.overallScore || 0;
   const readiness = evaluation?.readinessLevel || 'needs-work';
