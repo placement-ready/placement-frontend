@@ -97,7 +97,7 @@ const RecentInterviews = () => {
               <motion.div
                 key={interview._id}
                 variants={subtleListItem}
-                className="flex items-center justify-between gap-4 rounded-lg border border-transparent bg-background px-4 py-3 transition-colors duration-200 hover:border-border/60"
+                className="flex items-center justify-between gap-4 rounded-lg border border-transparent bg-slate-50 px-4 py-3 transition-all duration-200 hover:border-slate-200 hover:bg-white hover:shadow-sm dark:bg-slate-800/30 dark:hover:border-slate-700 dark:hover:bg-slate-800/50"
               >
                 <Link
                   href={
@@ -109,7 +109,7 @@ const RecentInterviews = () => {
                   }
                   className="flex flex-1 items-center gap-3"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/40 text-muted-foreground">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400">
                     {interview.status === 'evaluated' || interview.status === 'completed' ? (
                       <BadgeCheck className="h-5 w-5" />
                     ) : (
@@ -117,13 +117,13 @@ const RecentInterviews = () => {
                     )}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-foreground sm:text-base">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white sm:text-base">
                       {interview.title}
                     </p>
-                    <p className="text-xs capitalize text-muted-foreground sm:text-sm">
+                    <p className="text-xs capitalize text-slate-600 dark:text-slate-400 sm:text-sm">
                       {interview.type.replace('-', ' ')}
                     </p>
-                    <p className="text-xs text-muted-foreground/80">
+                    <p className="text-xs text-slate-500 dark:text-slate-500">
                       {interview.completedAt
                         ? formatDate(interview.completedAt)
                         : formatDate(interview.createdAt)}
@@ -146,7 +146,7 @@ const RecentInterviews = () => {
             ))}
           </motion.div>
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground sm:text-sm">
+            <p className="text-xs text-slate-600 dark:text-slate-400 sm:text-sm">
               Interviews are automatically summarised so you can revisit takeaways anytime.
             </p>
             <Link

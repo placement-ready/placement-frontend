@@ -48,7 +48,7 @@ const statusCopy: Record<
   pending: {
     label: 'Pending',
     icon: FileText,
-    tone: 'text-muted-foreground',
+    tone: 'text-slate-500 dark:text-slate-400',
   },
 };
 
@@ -66,10 +66,12 @@ const ResumeStatus = () => {
           <DashboardCardSection className="gap-6">
             <div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Completion</span>
-                <span className="font-semibold text-foreground">{progressPercentage}%</span>
+                <span className="text-slate-600 dark:text-slate-400">Completion</span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {progressPercentage}%
+                </span>
               </div>
-              <div className="mt-2 h-2 rounded-full bg-muted">
+              <div className="mt-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
@@ -87,11 +89,11 @@ const ResumeStatus = () => {
                   <motion.div
                     key={step.id}
                     whileHover={{ y: -2 }}
-                    className="flex items-center justify-between rounded-lg border border-transparent bg-background px-4 py-3 transition-colors duration-200 hover:border-border/60"
+                    className="flex items-center justify-between rounded-lg border border-transparent bg-slate-50 px-4 py-3 transition-all duration-200 hover:border-slate-200 hover:bg-white hover:shadow-sm dark:bg-slate-800/30 dark:hover:border-slate-700 dark:hover:bg-slate-800/50"
                   >
                     <div>
-                      <p className="font-medium text-foreground">{step.label}</p>
-                      <p className="text-xs text-muted-foreground">{copy.label}</p>
+                      <p className="font-medium text-slate-900 dark:text-white">{step.label}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">{copy.label}</p>
                     </div>
                     <span className={cn('flex items-center gap-2 text-sm font-medium', copy.tone)}>
                       <Icon className="h-4 w-4" />
@@ -102,13 +104,7 @@ const ResumeStatus = () => {
               })}
             </div>
           </DashboardCardSection>
-          <DashboardCardFooter>
-            <div>
-              <p className="text-sm font-medium text-foreground">Next suggested update</p>
-              <p className="text-xs text-muted-foreground">
-                Add impact metrics to your recent role.
-              </p>
-            </div>
+          <DashboardCardFooter className="px-0 pb-0">
             <Button asChild size="sm">
               <Link href="/dashboard/resume-builder" className="flex items-center">
                 Continue editing

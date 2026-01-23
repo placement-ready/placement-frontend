@@ -191,7 +191,7 @@ export default function InterviewResultPage() {
   const ReadinessIcon = readinessInfo.icon;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 lg:px-8">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 lg:px-8">
       {/* Back button */}
       <button
         onClick={() => router.push('/dashboard')}
@@ -257,7 +257,7 @@ export default function InterviewResultPage() {
       </motion.div>
 
       {/* Feedback Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="flex flex-col gap-4">
         {/* Strengths */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -344,7 +344,7 @@ export default function InterviewResultPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                      className={`flex px-2 py-1 items-center justify-center rounded-full text-sm font-bold ${
                         result.score >= 70
                           ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
                           : result.score >= 50

@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ArrowUpRight,
   ArrowDownRight,
+  ChevronLeft,
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ interface Interview {
   sessionId: string;
   title: string;
   type: 'behavioral' | 'technical' | 'case-study';
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed' | 'evaluated' | 'pending-evaluation';
   score?: number;
   completedAt?: string;
   createdAt: string;
@@ -53,36 +54,68 @@ const typeColors = {
   'case-study': 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300',
 };
 
+const statusConfig = {
+  pending: {
+    label: 'Pending',
+    className: 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300',
+  },
+  'in-progress': {
+    label: 'In Progress',
+    className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+  },
+  completed: {
+    label: 'Completed',
+    className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+  },
+  evaluated: {
+    label: 'Evaluated',
+    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+  },
+  'pending-evaluation': {
+    label: 'Awaiting AI',
+    className: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300',
+  },
+};
+
+const ITEMS_PER_PAGE = 10;
+
 export default function ResultsPage() {
   const router = useRouter();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [stats, setStats] = useState<InterviewStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    try {
-      const [interviewsRes, statsRes] = await Promise.all([
-        api.get<{ success: boolean; interviews: Interview[] }>(
-          '/interviews?status=completed&limit=20',
-        ),
-        api.get<{ success: boolean; stats: InterviewStats }>('/interviews/stats'),
-      ]);
-      setInterviews(interviewsRes.interviews || []);
-      setStats(statsRes.stats || null);
-    } catch (error) {
-      console.error('Failed to load results:', error);
-    } finally {
-      setIsLoading(false);
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        const [interviewsRes, statsRes] = await Promise.all([
+          api.get<{ success: boolean; interviews: Interview[]; total: number }>(
+            `/interviews?limit=${ITEMS_PER_PAGE}&page=${currentPage}`,
+          ),
+          api.get<{ success: boolean; stats: InterviewStats }>('/interviews/stats'),
+        ]);
+        setInterviews(interviewsRes.interviews || []);
+        setTotalPages(Math.ceil((interviewsRes.total || 0) / ITEMS_PER_PAGE));
+        setStats(statsRes.stats || null);
+      } catch (error) {
+        console.error('Failed to load results:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
 
-  // Calculate trend
-  const recentScores = interviews.slice(0, 5).map((i) => i.score || 0);
-  const olderScores = interviews.slice(5, 10).map((i) => i.score || 0);
+    loadData();
+  }, [currentPage]);
+
+  // Calculate trend from completed interviews only
+  const completedInterviews = interviews.filter(
+    (i) => i.status === 'completed' || i.status === 'evaluated',
+  );
+  const recentScores = completedInterviews.slice(0, 5).map((i) => i.score || 0);
+  const olderScores = completedInterviews.slice(5, 10).map((i) => i.score || 0);
   const recentAvg =
     recentScores.length > 0 ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length : 0;
   const olderAvg =
@@ -90,7 +123,7 @@ export default function ResultsPage() {
   const trend = recentAvg - olderAvg;
   const isPositiveTrend = trend >= 0;
 
-  if (isLoading) {
+  if (isLoading && currentPage === 1) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -119,7 +152,7 @@ export default function ResultsPage() {
           </div>
         </div>
         <Button
-          onClick={() => router.push('/dashboard/interview/schedule')}
+          onClick={() => router.push('/dashboard/interview/new')}
           className="bg-emerald-600 text-white hover:bg-emerald-500"
         >
           Start New Interview
@@ -237,57 +270,145 @@ export default function ResultsPage() {
         {interviews.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-muted/30 p-12 text-center">
             <Trophy className="mx-auto h-12 w-12 text-muted-foreground/50" />
-            <h4 className="mt-4 text-lg font-semibold text-foreground">No completed interviews</h4>
+            <h4 className="mt-4 text-lg font-semibold text-foreground">No interviews found</h4>
             <p className="mt-2 text-sm text-muted-foreground">
-              Complete an interview to see your results here
+              Start an interview to see your results here
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {interviews.map((interview) => (
-              <motion.div
-                key={interview._id}
-                variants={fadeIn}
-                className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-                    <Trophy
-                      className={`h-6 w-6 ${
-                        (interview.score || 0) >= 80
-                          ? 'text-emerald-500'
-                          : (interview.score || 0) >= 60
-                            ? 'text-amber-500'
-                            : 'text-red-500'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-foreground">{interview.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          typeColors[interview.type]
-                        }`}
-                      >
-                        {interview.type}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {interview.completedAt && formatDate(interview.completedAt)}
-                      </span>
+          <div>
+            <div className="space-y-3">
+              {interviews.map((interview) => (
+                <motion.div
+                  key={interview._id}
+                  variants={fadeIn}
+                  onClick={() => {
+                    if (interview.status === 'completed' || interview.status === 'evaluated') {
+                      router.push(`/dashboard/interview/result/${interview._id}`);
+                    } else if (interview.status === 'in-progress') {
+                      router.push(`/dashboard/interview/room?session=${interview.sessionId}`);
+                    }
+                  }}
+                  className={`flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-shadow ${
+                    interview.status === 'completed' ||
+                    interview.status === 'evaluated' ||
+                    interview.status === 'in-progress'
+                      ? 'cursor-pointer hover:shadow-md'
+                      : 'cursor-default'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+                      {interview.status === 'completed' || interview.status === 'evaluated' ? (
+                        <Trophy
+                          className={`h-6 w-6 ${
+                            (interview.score || 0) >= 80
+                              ? 'text-emerald-500'
+                              : (interview.score || 0) >= 60
+                                ? 'text-amber-500'
+                                : 'text-red-500'
+                          }`}
+                        />
+                      ) : interview.status === 'in-progress' ? (
+                        <Clock className="h-6 w-6 text-blue-500" />
+                      ) : interview.status === 'pending-evaluation' ? (
+                        <Clock className="h-6 w-6 text-amber-500" />
+                      ) : (
+                        <Clock className="h-6 w-6 text-gray-500" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-foreground">{interview.title}</h4>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            typeColors[interview.type]
+                          }`}
+                        >
+                          {interview.type}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            statusConfig[interview.status].className
+                          }`}
+                        >
+                          {statusConfig[interview.status].label}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {interview.completedAt
+                            ? formatDate(interview.completedAt)
+                            : formatDate(interview.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-foreground">{interview.score || 0}%</p>
-                    <p className="text-xs text-muted-foreground">Score</p>
+                  <div className="flex items-center gap-4">
+                    {interview.status === 'completed' || interview.status === 'evaluated' ? (
+                      <>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-foreground">
+                            {interview.score || 0}%
+                          </p>
+                          <p className="text-xs text-muted-foreground">Score</p>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </>
+                    ) : (
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {interview.status === 'in-progress'
+                            ? 'Continue'
+                            : interview.status === 'pending-evaluation'
+                              ? 'Processing'
+                              : 'Not Started'}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1 || isLoading}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      disabled={isLoading}
+                      className={`h-8 w-8 p-0 ${
+                        page === currentPage ? 'bg-emerald-600 text-white hover:bg-emerald-500' : ''
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  ))}
                 </div>
-              </motion.div>
-            ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages || isLoading}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </motion.div>

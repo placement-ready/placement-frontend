@@ -1,31 +1,67 @@
-import WorkInProgress from '@/components/landing/WorkInProgress';
+'use client';
 
-const highlights = [
+import FeaturePageLayout from '@/components/landing/FeaturePageLayout';
+import { Route, BookOpen, Layers, CheckCircle, Compass, GraduationCap } from 'lucide-react';
+
+const features = [
   {
-    title: 'Pixel polish',
-    description: 'We are refining the micro-interactions so every tap feels intentional.',
+    icon: Route,
+    title: 'Customizable Roadmaps',
+    description:
+      'Create personalized learning paths based on your target role, experience level, and timeline.',
   },
   {
-    title: 'Guided prep',
-    description: 'New interview flows that adapt to your actual progress, not a template.',
+    icon: BookOpen,
+    title: 'Structured Curriculum',
+    description:
+      'Follow a well-organized curriculum covering technical skills, behavioral questions, and industry knowledge.',
   },
   {
-    title: 'Team insights',
-    description: 'Fresh analytics to translate practice sessions into measurable wins.',
+    icon: Layers,
+    title: 'Role-Specific Tracks',
+    description:
+      'Choose from tracks designed for software engineers, data scientists, product managers, and more.',
+  },
+  {
+    icon: CheckCircle,
+    title: 'Milestone Achievements',
+    description:
+      'Celebrate your progress with milestone badges and track completion percentages for each module.',
+  },
+  {
+    icon: Compass,
+    title: 'Adaptive Learning',
+    description:
+      'Our system adapts to your performance, focusing more on areas where you need improvement.',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Expert-Curated Content',
+    description:
+      'Learn from content curated by industry professionals with real hiring experience.',
   },
 ];
 
-export default function WorkInProgressPage() {
+const benefits = [
+  'Clear step-by-step guidance from beginner to interview-ready',
+  'Save time with focused, relevant preparation materials',
+  'Build skills progressively without feeling overwhelmed',
+  'Stay motivated with visible progress and achievements',
+  'Prepare efficiently with a timeline-based approach',
+  'Access role-specific content for your target position',
+];
+
+export default function LearningPathsPage() {
   return (
-    <WorkInProgress
-      title="This feature is almost ready"
-      headline="Thanks for stopping by"
-      description="We are stitching the final UI, QA-ing the flows, and making sure performance lives up to the hype. Hang tight a little longer."
-      statusLabel="In beta"
-      eta="ETA: Q1 2026"
-      highlights={highlights}
-      primaryAction={{ label: 'Return home', href: '/' }}
-      secondaryAction={{ label: 'Peek at the dashboard', href: '/dashboard' }}
+    <FeaturePageLayout
+      badge="Structured Learning"
+      title="Master Your Path to Success"
+      subtitle="Learning Paths"
+      description="Follow structured, role-specific learning paths designed by industry experts to take you from where you are to where you want to be in your career."
+      features={features}
+      benefits={benefits}
+      ctaTitle="Start Your Learning Journey"
+      ctaDescription="Choose your track and begin your structured preparation today."
     />
   );
 }

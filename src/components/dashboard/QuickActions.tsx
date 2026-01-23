@@ -3,15 +3,7 @@
 import type { ComponentType, SVGProps } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  FileText,
-  LayoutDashboard,
-  Sparkles,
-  Bookmark,
-  Users,
-  ClipboardList,
-} from 'lucide-react';
+import { ArrowRight, FileText, Sparkles, Users, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { DashboardCard, DashboardCardSection } from './DashboardCard';
@@ -21,7 +13,6 @@ interface ActionItem {
   description: string;
   href: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
-  accent?: 'primary' | 'neutral';
 }
 
 const actionItems: ActionItem[] = [
@@ -30,7 +21,6 @@ const actionItems: ActionItem[] = [
     description: 'Jump into an AI-powered mock interview session tailored to your goals.',
     href: '/dashboard/interview',
     icon: Sparkles,
-    accent: 'primary',
   },
   {
     title: 'Build Resume',
@@ -41,18 +31,6 @@ const actionItems: ActionItem[] = [
 ];
 
 const secondaryActions: ActionItem[] = [
-  {
-    title: 'View Analytics',
-    description: 'Track recent interview performance and spot areas to refine.',
-    href: '/dashboard/analytics',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Saved Resources',
-    description: 'Access your bookmarked articles, videos, and practice questions.',
-    href: '/dashboard/resources/saved',
-    icon: Bookmark,
-  },
   {
     title: 'Manage Profile',
     description: 'Update your personal info, preferences, and account settings.',
@@ -67,11 +45,6 @@ const secondaryActions: ActionItem[] = [
   },
 ];
 
-const iconStyles: Record<NonNullable<ActionItem['accent']>, string> = {
-  primary: 'text-emerald-600 dark:text-emerald-400',
-  neutral: 'text-muted-foreground',
-};
-
 const QuickActions = () => (
   <DashboardCard heading="Quick actions" subheading="Focus on what moves you forward today.">
     <DashboardCardSection className="gap-5">
@@ -81,24 +54,17 @@ const QuickActions = () => (
             <motion.div
               whileHover={{ y: -4, scale: 1.01 }}
               className={cn(
-                'flex h-full flex-col justify-between rounded-xl border border-border/70 bg-muted/40 p-5 transition-colors duration-200 group-hover:border-emerald-200 dark:group-hover:border-emerald-700',
+                'flex h-full flex-col justify-between rounded-xl border border-slate-200/70 bg-white/80 p-5 shadow-sm transition-all duration-200 group-hover:border-emerald-300 group-hover:shadow-md dark:border-slate-800/70 dark:bg-slate-900/40 dark:group-hover:border-emerald-500/50',
               )}
             >
-              <div className="flex items-start gap-3">
-                <span
-                  className={cn(
-                    'inline-flex h-10 w-10 items-center justify-center rounded-lg bg-background text-muted-foreground shadow-sm',
-                    action.accent === 'primary' ? iconStyles.primary : iconStyles.neutral,
-                  )}
-                >
-                  <action.icon className="h-5 w-5" />
-                </span>
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-foreground sm:text-base">
-                    {action.title}
-                  </p>
-                  <p className="text-sm text-muted-foreground leading-snug">{action.description}</p>
-                </div>
+              <div className="space-y-3">
+                <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white sm:text-base">
+                  <action.icon className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                  {action.title}
+                </p>
+                <p className="text-sm leading-snug text-slate-600 dark:text-slate-400">
+                  {action.description}
+                </p>
               </div>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium text-emerald-600 transition-colors duration-200 group-hover:text-emerald-500 dark:text-emerald-400">
                 <span>Continue</span>
@@ -109,8 +75,8 @@ const QuickActions = () => (
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/30 px-4 py-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-100/60 px-4 py-3 dark:bg-slate-800/40">
+        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
           <Sparkles className="h-4 w-4 text-emerald-500" />
           <span>Need a refresher first?</span>
         </div>
@@ -124,13 +90,13 @@ const QuickActions = () => (
           <Link key={action.title} href={action.href} className="group focus:outline-none">
             <motion.div
               whileHover={{ y: -3, scale: 1.005 }}
-              className="flex items-center justify-between rounded-lg border border-dashed border-border/70 bg-background px-4 py-3 text-sm transition-all duration-200 group-hover:border-emerald-200 dark:group-hover:border-emerald-700"
+              className="flex items-center justify-between rounded-lg border border-dashed border-slate-200/70 bg-white px-4 py-3 text-sm transition-all duration-200 group-hover:border-emerald-300 dark:border-slate-800/70 dark:bg-slate-900/30 dark:group-hover:border-emerald-500/50"
             >
-              <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
                 <action.icon className="h-4 w-4" />
                 <span>{action.title}</span>
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <ArrowRight className="h-4 w-4 text-slate-400 dark:text-slate-500" />
             </motion.div>
           </Link>
         ))}

@@ -1,31 +1,65 @@
-import WorkInProgress from '@/components/landing/WorkInProgress';
+'use client';
 
-const highlights = [
+import FeaturePageLayout from '@/components/landing/FeaturePageLayout';
+import { BarChart3, TrendingUp, History, Target, LineChart, Clock } from 'lucide-react';
+
+const features = [
   {
-    title: 'Pixel polish',
-    description: 'We are refining the micro-interactions so every tap feels intentional.',
+    icon: BarChart3,
+    title: 'Performance Analytics',
+    description:
+      'Detailed analytics showing your performance across different question types their, topics, and difficulty levels.',
   },
   {
-    title: 'Guided prep',
-    description: 'New interview flows that adapt to your actual progress, not a template.',
+    icon: TrendingUp,
+    title: 'Skill Improvement Charts',
+    description:
+      'Visual charts displaying your improvement trajectory over time for each skill category.',
   },
   {
-    title: 'Team insights',
-    description: 'Fresh analytics to translate practice sessions into measurable wins.',
+    icon: History,
+    title: 'Session History',
+    description:
+      'Access complete history of all your practice sessions with detailed feedback and scores.',
+  },
+  {
+    icon: Target,
+    title: 'Goal Setting',
+    description:
+      'Set personal goals and track your progress towards achieving them with clear milestones.',
+  },
+  {
+    icon: LineChart,
+    title: 'Comparative Insights',
+    description: 'See how your performance compares to successful candidates in similar roles.',
+  },
+  {
+    icon: Clock,
+    title: 'Time Analytics',
+    description: 'Track response times and learn to pace yourself effectively during interviews.',
   },
 ];
 
-export default function WorkInProgressPage() {
+const benefits = [
+  'Understand exactly where you stand in your preparation',
+  'Identify patterns in your strengths and weaknesses',
+  'Make data-driven decisions about what to practice next',
+  'Stay motivated by seeing measurable improvement',
+  'Optimize your preparation time with focused practice',
+  'Prepare confidently knowing your readiness level',
+];
+
+export default function ProgressTrackingPage() {
   return (
-    <WorkInProgress
-      title="This feature is almost ready"
-      headline="Thanks for stopping by"
-      description="We are stitching the final UI, QA-ing the flows, and making sure performance lives up to the hype. Hang tight a little longer."
-      statusLabel="In beta"
-      eta="ETA: Q1 2026"
-      highlights={highlights}
-      primaryAction={{ label: 'Return home', href: '/' }}
-      secondaryAction={{ label: 'Peek at the dashboard', href: '/dashboard' }}
+    <FeaturePageLayout
+      badge="Data-Driven"
+      title="Track Every Step of Your Growth"
+      subtitle="Progress Tracking"
+      description="Get comprehensive insights into your interview preparation journey with detailed analytics, performance trends, and actionable recommendations."
+      features={features}
+      benefits={benefits}
+      ctaTitle="See Your Progress in Action"
+      ctaDescription="Start tracking your improvement and make every practice session count."
     />
   );
 }

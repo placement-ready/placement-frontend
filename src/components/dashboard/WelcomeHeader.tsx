@@ -71,13 +71,13 @@ const WelcomeHeader = () => {
       }
     >
       <DashboardCardSection>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           Your personalised dashboard keeps track of interviews, resume updates, and milestones so
           you always know the next best step.
         </p>
         {isLoading ? (
           <div className="flex items-center justify-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
@@ -85,16 +85,16 @@ const WelcomeHeader = () => {
               <motion.div
                 key={item.label}
                 whileHover={{ y: -2 }}
-                className="flex items-start gap-3 rounded-lg bg-muted/30 px-4 py-3 text-sm"
+                className="flex items-start gap-3 rounded-lg bg-slate-100 px-4 py-3 text-sm dark:bg-slate-800/40"
               >
-                <span className="mt-1 text-muted-foreground">
+                <span className="mt-1 text-slate-500 dark:text-slate-400">
                   <item.icon className="h-4 w-4" />
                 </span>
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground/80">
+                  <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     {item.label}
                   </p>
-                  <p className="font-medium text-foreground">{item.value}</p>
+                  <p className="font-medium text-slate-900 dark:text-white">{item.value}</p>
                 </div>
               </motion.div>
             ))}

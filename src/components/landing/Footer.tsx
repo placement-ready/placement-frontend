@@ -1,350 +1,210 @@
 'use client';
+
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+const footerLinks = {
+  product: [
+    { name: 'Features', href: '/features/ai-mentor' },
+    { name: 'How It Works', href: '/how-it-works' },
+    { name: 'Pricing', href: '/pricing' },
+  ],
+  company: [
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: 'mailto:support@hiremind.io' },
+  ],
+  legal: [
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+  ],
+};
+
+const socialLinks = [
+  {
+    name: 'Twitter',
+    href: 'https://twitter.com/hiremind',
+    icon: (
+      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://linkedin.com/company/hiremind',
+    icon: (
+      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'GitHub',
+    href: 'https://github.com/hiremind',
+    icon: (
+      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+      </svg>
+    ),
+  },
+];
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 25px 25px, rgba(34, 197, 94, 0.2) 2px, transparent 2px)`,
-            backgroundSize: '50px 50px',
-          }}
-        ></div>
-      </div>
-
-      {/* Green accent line */}
-      <div className="h-1 bg-linear-to-r from-emerald-400 via-green-500 to-emerald-600"></div>
+    <footer className="border-t border-border bg-card text-card-foreground">
+      {/* Accent line */}
+      <div className="h-1 bg-linear-to-r from-emerald-500 via-primary to-emerald-600" />
 
       {/* Main Footer */}
-      <div className="relative px-4 sm:px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {/* Company Info */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 flex items-center justify-center mr-2 shadow-lg">
-                  <Image
-                    src="/logo.png"
-                    alt="HireMind"
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
-                </div>
-                <span className="text-2xl font-bold bg-linear-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
-                  HireMind
-                </span>
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="HireMind"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                Practice interviews with fast feedback and resume-ready outcomes.
-              </p>
-              <div className="flex space-x-3">
-                {/* Social icons with enhanced styling */}
+              <span className="text-xl font-bold text-primary">HireMind</span>
+            </Link>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Practice interviews with AI-powered feedback and resume-ready outcomes.
+            </p>
+            <div className="mt-6 flex gap-3">
+              {socialLinks.map((social) => (
                 <a
-                  href="#"
-                  className="group w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-linear-to-r hover:from-emerald-500 hover:to-green-500 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:scale-105"
+                  aria-label={social.name}
                 >
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                  </svg>
+                  {social.icon}
                 </a>
-                <a
-                  href="#"
-                  className="group w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-linear-to-r hover:from-emerald-500 hover:to-green-500 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                >
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                  </svg>
-                </a>
-                <a
-                  href="#"
-                  className="group w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-linear-to-r hover:from-emerald-500 hover:to-green-500 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                >
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.042-3.441.219-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.690 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.357-.631-2.750-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.990-5.367 11.990-11.986C24.007 5.367 18.641.001 12.017.001z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            {/* Product */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-bold text-emerald-400 mb-6">Product</h4>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Practice Questions
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    AI Feedback
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Study Plans
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Interview Prep
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Mock Interviews
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-bold text-emerald-400 mb-6">Company</h4>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Press
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Partners
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-bold text-emerald-400 mb-6">Support</h4>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    API Reference
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Community
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 transition-colors duration-200 text-sm flex items-center hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                  >
-                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2"></span>
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
+              ))}
             </div>
           </div>
 
-          {/* Newsletter Section */}
-          <div className="mt-12 p-8 bg-linear-to-r from-gray-800/50 to-gray-700/50 rounded-2xl border border-gray-700/50 backdrop-blur-sm">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-emerald-400 mb-2 flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+          {/* Product Links */}
+          <div>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+              Product
+            </h4>
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Stay Updated
-                </h4>
-                <p className="text-gray-300 text-sm">
-                  Get interview tips and product updates delivered to your inbox.
-                </p>
-              </div>
-              <div className="flex gap-3 items-center w-full md:w-auto">
-                <div className="relative flex-1 md:w-64">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-sm text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+              Company
+            </h4>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+              Legal
+            </h4>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Newsletter */}
+        <div className="mt-12 rounded-2xl border border-border bg-muted/50 p-6 backdrop-blur-sm">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <h4 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <svg
+                  className="h-5 w-5 text-primary"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
-                </div>
-                <button className="px-6 py-3 bg-linear-to-r from-emerald-500 to-green-500 text-sm text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-200 hover:scale-105 hover:shadow-lg whitespace-nowrap">
-                  Subscribe
-                </button>
-              </div>
+                </svg>
+                Stay Updated
+              </h4>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Get interview tips and product updates delivered to your inbox.
+              </p>
+            </div>
+            <div className="flex w-full gap-3 md:w-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 md:w-64"
+              />
+              <button className="whitespace-nowrap rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105">
+                Subscribe
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="relative border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm">
-        <div className="px-4 sm:px-6 py-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-gray-400 text-sm">© 2025 HireMind. All rights reserved.</p>
-              <div className="flex items-center space-x-6">
-                <span className="text-gray-400 text-sm flex items-center">
-                  Made with
-                  <svg
-                    className="w-4 h-4 text-red-500 mx-1 animate-pulse"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  for job seekers
-                </span>
-                <a
-                  href="#"
-                  className="text-gray-400 text-sm transition-colors duration-200 hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                >
-                  Status
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 text-sm transition-colors duration-200 hover:text-emerald-300 hover:underline decoration-emerald-300/60"
-                >
-                  Security
-                </a>
-              </div>
-            </div>
-          </div>
+      <div className="border-t border-border bg-muted/30">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} HireMind. All rights reserved.
+          </p>
+          <p className="flex items-center gap-1 text-sm text-muted-foreground">
+            Made with
+            <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clipRule="evenodd"
+              />
+            </svg>
+            for job seekers
+          </p>
         </div>
       </div>
     </footer>

@@ -110,7 +110,7 @@ export default function NewInterviewPage() {
   return (
     <div className="min-h-screen pb-16">
       {/* Header */}
-      <div className="bg-gradient-to-b from-emerald-50/50 via-transparent to-transparent dark:from-emerald-900/10">
+      <div className="bg-linear-to-b from-emerald-50/50 via-transparent to-transparent dark:from-emerald-900/10">
         <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 pb-8 pt-8 sm:px-6">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
@@ -256,7 +256,7 @@ export default function NewInterviewPage() {
           <Button
             onClick={handleStartInterview}
             disabled={isCreating || !isValid}
-            className="w-full gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 py-6 text-base font-semibold text-white shadow-lg hover:shadow-xl disabled:opacity-50"
+            className="w-full gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-emerald-500 py-6 text-base font-semibold text-white shadow-lg hover:shadow-xl disabled:opacity-50"
           >
             {isCreating ? (
               <>
