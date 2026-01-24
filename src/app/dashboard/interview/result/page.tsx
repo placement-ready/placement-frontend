@@ -97,9 +97,10 @@ export default function ResultsPage() {
           ),
           api.get<{ success: boolean; stats: InterviewStats }>('/interviews/stats'),
         ]);
-        setInterviews(interviewsRes.interviews || []);
-        setTotalPages(Math.ceil((interviewsRes.total || 0) / ITEMS_PER_PAGE));
-        setStats(statsRes.stats || null);
+
+        setInterviews(interviewsRes.interviews);
+        setTotalPages(Math.ceil(interviewsRes.total / ITEMS_PER_PAGE));
+        setStats(statsRes.stats);
       } catch (error) {
         console.error('Failed to load results:', error);
       } finally {
@@ -279,9 +280,8 @@ export default function ResultsPage() {
           <div>
             <div className="space-y-3">
               {interviews.map((interview) => (
-                <motion.div
+                <div
                   key={interview._id}
-                  variants={fadeIn}
                   onClick={() => {
                     if (interview.status === 'completed' || interview.status === 'evaluated') {
                       router.push(`/dashboard/interview/result/${interview._id}`);
@@ -366,7 +366,7 @@ export default function ResultsPage() {
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 

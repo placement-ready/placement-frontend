@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -107,26 +107,38 @@ export default function InterviewResultPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (sessionId) {
-      loadInterview();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId]);
-
-  async function loadInterview() {
+  const loadInterview = useCallback(async () => {
     try {
       const response = await api.get<{ success: boolean; interview: Interview }>(
         `/interviews/${sessionId}`,
       );
-      setInterview(response.interview);
+      const interviewData = response.interview;
+
+      if (
+        interviewData.status === 'pending-evaluation' ||
+        (interviewData.status === 'completed' && !interviewData.evaluation)
+      ) {
+        const evalResponse = await api.post<{ success: boolean; evaluation: Evaluation }>(
+          `/interviews/${interviewData.sessionId}/evaluate`,
+        );
+        interviewData.evaluation = evalResponse.evaluation;
+        interviewData.status = 'evaluated';
+      }
+
+      setInterview(interviewData);
     } catch (err) {
       console.error('Failed to load interview:', err);
       setError('Failed to load interview results');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (sessionId) {
+      loadInterview();
+    }
+  }, [sessionId, loadInterview]);
 
   if (isLoading) {
     return (

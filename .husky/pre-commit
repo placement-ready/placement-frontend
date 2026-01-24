@@ -15,8 +15,4 @@ fi
 
 echo "Lint and format completed successfully."
 
-git stash push -k -u -m "pre-commit-unstaged"
-git add .
-git stash pop || true
-
 exit 0
