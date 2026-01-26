@@ -1,281 +1,209 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Save, Download, FileText } from 'lucide-react';
-
+import { FileText, MessageSquare, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-import { fadeIn } from '@/components/dashboard/motion';
+import { ResumeBuilderProvider, useResumeBuilder } from '@/providers/ResumeBuilderProvider';
 
-const initialResume = {
-  name: 'Nora Jensen',
-  role: 'Product Manager',
-  summary:
-    'Product leader focused on zero-to-one launches and measurable growth. Previously scaled B2B workflows that improved activation by 18% and automated reporting for 40+ customer teams.',
-  skills: 'Product strategy, Roadmapping, Experimentation, User research, Stakeholder alignment',
-  experience:
-    'Senior Product Manager — Lumen Analytics\nGrew self-serve onboarding funnel from 22% to 35% completion in two quarters by simplifying activation loops and partnering closely with design research.\n\nProduct Manager — SummitOS\nLaunched a collaborative planning tool used weekly by 70% of enterprise accounts and reduced planning cycle time by 24%.',
-  projects:
-    'Growth Targeting Revamp\nDefined scoring signals for account propensity and led roll-out that drove a 14% uplift in qualified pipeline.\n\nSignal Playbooks\nPartnered with RevOps to package customer insights into modular playbooks consumed across GTM teams.',
-};
+function ResumeBuilderLandingContent() {
+  const router = useRouter();
+  const { session, isConnected, isLoading, error, startSession } = useResumeBuilder();
+  const [hasExistingSession, setHasExistingSession] = useState(false);
 
-export default function ResumePage() {
-  const [formData, setFormData] = useState(initialResume);
-  const [isSaving, setIsSaving] = useState(false);
+  // Check for existing session on mount
+  useEffect(() => {
+    if (session && session.status !== 'completed') {
+      setHasExistingSession(true);
+    }
+  }, [session]);
 
-  const handleInputChange =
-    (field: keyof typeof initialResume) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: event.target.value }));
-    };
+  // Navigate to chat when session starts
+  useEffect(() => {
+    if (session && !isLoading) {
+      router.push('/dashboard/resume-builder/chat');
+    }
+  }, [session, isLoading, router]);
 
-  const handleSaveDraft = async () => {
-    setIsSaving(true);
-    // Simulate save
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.info('Mock save', formData);
-    setIsSaving(false);
+  const handleStart = () => {
+    startSession();
   };
 
-  const handleExport = () => {
-    console.info('Mock export', formData);
+  const handleContinue = () => {
+    if (session) {
+      router.push('/dashboard/resume-builder/chat');
+    }
   };
-
-  const parsedSkills = formData.skills
-    .split(',')
-    .map((skill) => skill.trim())
-    .filter(Boolean);
 
   return (
-    <motion.div
-      className="mx-auto max-w-6xl space-y-8 px-4 py-6 lg:px-8"
-      initial="hidden"
-      animate="visible"
-      variants={fadeIn}
-    >
-      {/* Page Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20">
-            <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+    <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-4 py-12 text-center">
+      {/* Hero Icon */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 rounded-2xl bg-linear-to-br from-emerald-500 to-teal-500 p-5 shadow-lg shadow-emerald-500/20"
+      >
+        <FileText className="h-12 w-12 text-white" />
+      </motion.div>
+
+      {/* Title */}
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mb-4 text-3xl font-bold text-foreground sm:text-4xl"
+      >
+        AI Resume Builder
+      </motion.h1>
+
+      {/* Description */}
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="mb-8 max-w-xl text-lg text-muted-foreground"
+      >
+        Build your professional resume through a friendly conversation. Our AI assistant will guide
+        you step-by-step to create a standout resume.
+      </motion.p>
+
+      {/* Features */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        className="mb-10 grid gap-4 sm:grid-cols-3"
+      >
+        <FeatureCard
+          icon={MessageSquare}
+          title="Conversational"
+          description="Just chat naturally — no forms to fill"
+        />
+        <FeatureCard
+          icon={Sparkles}
+          title="AI-Powered"
+          description="Smart guidance at every step"
+        />
+        <FeatureCard
+          icon={FileText}
+          title="Structured Output"
+          description="Get a professional resume format"
+        />
+      </motion.div>
+
+      {/* Error */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive"
+        >
+          {error}
+        </motion.div>
+      )}
+
+      {/* Connection status */}
+      {!isConnected && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 text-sm text-amber-600 dark:text-amber-400"
+        >
+          Connecting to server...
+        </motion.div>
+      )}
+
+      {/* CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      >
+        {hasExistingSession ? (
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <Button
+              onClick={handleContinue}
+              size="lg"
+              className="bg-emerald-600 text-white hover:bg-emerald-500"
+            >
+              Continue Resume
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+              onClick={handleStart}
+              variant="outline"
+              size="lg"
+              disabled={!isConnected || isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Starting...
+                </>
+              ) : (
+                'Start New'
+              )}
+            </Button>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Resume Builder</h1>
-            <p className="text-sm text-muted-foreground">Craft your story with live preview</p>
-          </div>
-        </div>
-      </div>
+        ) : (
+          <Button
+            onClick={handleStart}
+            size="lg"
+            disabled={!isConnected || isLoading}
+            className="bg-linear-to-r from-emerald-600 to-teal-500 text-white shadow-lg hover:shadow-xl"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Starting...
+              </>
+            ) : (
+              <>
+                Build My Resume
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </>
+            )}
+          </Button>
+        )}
+      </motion.div>
 
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        {/* Form Card */}
-        <Card className="border-border/60 bg-card shadow-sm">
-          <CardHeader className="border-b border-border/50 pb-4">
-            <CardTitle className="flex items-center justify-between text-base">
-              <span className="text-foreground">Profile Details</span>
-              <span className="text-xs font-medium text-muted-foreground">Auto-saved</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <Label
-                  htmlFor="name"
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >
-                  Full Name
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={handleInputChange('name')}
-                  className="border-input bg-background focus-visible:ring-emerald-500"
-                  placeholder="Your name"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label
-                  htmlFor="role"
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >
-                  Role / Title
-                </Label>
-                <Input
-                  id="role"
-                  value={formData.role}
-                  onChange={handleInputChange('role')}
-                  className="border-input bg-background focus-visible:ring-emerald-500"
-                  placeholder="Your role"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="summary"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
-                Professional Summary
-              </Label>
-              <Textarea
-                id="summary"
-                value={formData.summary}
-                onChange={handleInputChange('summary')}
-                rows={4}
-                className="border-input bg-background focus-visible:ring-emerald-500"
-                placeholder="A brief overview of your experience and goals..."
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="skills"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
-                Skills (comma separated)
-              </Label>
-              <Input
-                id="skills"
-                value={formData.skills}
-                onChange={handleInputChange('skills')}
-                className="border-input bg-background focus-visible:ring-emerald-500"
-                placeholder="Skill 1, Skill 2, Skill 3..."
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="experience"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
-                Experience
-              </Label>
-              <Textarea
-                id="experience"
-                value={formData.experience}
-                onChange={handleInputChange('experience')}
-                rows={6}
-                className="border-input bg-background focus-visible:ring-emerald-500"
-                placeholder="Your work experience..."
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="projects"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
-                Key Projects
-              </Label>
-              <Textarea
-                id="projects"
-                value={formData.projects}
-                onChange={handleInputChange('projects')}
-                rows={5}
-                className="border-input bg-background focus-visible:ring-emerald-500"
-                placeholder="Notable projects and achievements..."
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-3 border-t border-border/50 pt-6">
-              <Button
-                type="button"
-                onClick={handleSaveDraft}
-                disabled={isSaving}
-                className="bg-emerald-600 text-white hover:bg-emerald-500"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving ? 'Saving...' : 'Save Draft'}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleExport}
-                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-500/30 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export PDF
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Preview Card */}
-        <Card className="border-border/60 bg-muted/30 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base text-foreground">Live Preview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <section className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground">{formData.name || 'Your Name'}</h2>
-              <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                {formData.role || 'Role / Title'}
-              </p>
-            </section>
-
-            <section className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Summary
-              </p>
-              <p className="text-sm leading-relaxed text-foreground/80">
-                {formData.summary || 'Add a short overview that highlights your impact.'}
-              </p>
-            </section>
-
-            <section className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Skills
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {parsedSkills.length ? (
-                  parsedSkills.map((skill) => (
-                    <motion.span
-                      key={skill}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground/80"
-                    >
-                      {skill}
-                    </motion.span>
-                  ))
-                ) : (
-                  <span className="text-sm text-muted-foreground">Add skills to see them here</span>
-                )}
-              </div>
-            </section>
-
-            <PreviewBlock label="Experience" body={formData.experience} />
-            <PreviewBlock label="Projects" body={formData.projects} />
-          </CardContent>
-        </Card>
-      </div>
-    </motion.div>
+      {/* Footer note */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+        className="mt-8 text-sm text-muted-foreground"
+      >
+        Takes about 5-10 minutes • Your data is saved automatically
+      </motion.p>
+    </div>
   );
 }
 
-interface PreviewBlockProps {
-  label: string;
-  body: string;
+interface FeatureCardProps {
+  icon: React.ElementType;
+  title: string;
+  description: string;
 }
 
-function PreviewBlock({ label, body }: PreviewBlockProps) {
+function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
   return (
-    <section className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <div
-        className={cn(
-          'rounded-xl border border-border bg-background/80 p-4 text-sm text-foreground/80',
-          body ? 'whitespace-pre-line' : 'text-muted-foreground',
-        )}
-      >
-        {body || 'Use the form to add details and they will appear here automatically.'}
+    <div className="rounded-xl border border-border bg-card p-4 text-left">
+      <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+        <Icon className="h-5 w-5 text-emerald-500" />
       </div>
-    </section>
+      <h3 className="mb-1 font-medium text-foreground">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+export default function ResumeBuilderPage() {
+  return (
+    <ResumeBuilderProvider>
+      <ResumeBuilderLandingContent />
+    </ResumeBuilderProvider>
   );
 }
