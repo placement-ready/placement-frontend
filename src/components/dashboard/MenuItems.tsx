@@ -1,4 +1,12 @@
-import { LayoutDashboard, Sparkles, FileText, TrendingUp, Settings, History } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Sparkles,
+  FileText,
+  TrendingUp,
+  Settings,
+  History,
+  FolderCheck,
+} from 'lucide-react';
 import { SidebarConfig } from './Sidebar';
 
 const menuItems: SidebarConfig = {
@@ -15,6 +23,13 @@ const menuItems: SidebarConfig = {
       name: 'Dashboard',
       icon: <LayoutDashboard className="h-5 w-5" />,
       href: '/dashboard',
+      type: 'link',
+    },
+    {
+      id: 'progress',
+      name: 'Progress',
+      icon: <TrendingUp className="h-5 w-5" />,
+      href: '/dashboard/skill-progress',
       type: 'link',
     },
     {
@@ -39,10 +54,10 @@ const menuItems: SidebarConfig = {
       type: 'link',
     },
     {
-      id: 'progress',
-      name: 'Progress',
-      icon: <TrendingUp className="h-5 w-5" />,
-      href: '/dashboard/skill-progress',
+      id: 'My Resumes',
+      name: 'My Resumes',
+      icon: <FolderCheck className="h-5 w-5" />,
+      href: '/dashboard/resumes',
       type: 'link',
     },
     {

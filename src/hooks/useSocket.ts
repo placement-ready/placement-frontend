@@ -32,13 +32,11 @@ export function useSocket(options: UseSocketOptions = {}) {
     });
 
     socketRef.current.on('connect', () => {
-      console.log('Socket connected:', socketRef.current?.id);
       setIsConnected(true);
       setError(null);
     });
 
-    socketRef.current.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+    socketRef.current.on('disconnect', () => {
       setIsConnected(false);
     });
 

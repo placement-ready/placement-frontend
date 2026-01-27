@@ -1,9 +1,20 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Send, Loader2, Wifi, WifiOff, CheckCircle, Sparkles, FileText, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
+import {
+  Send,
+  Loader2,
+  Wifi,
+  WifiOff,
+  CheckCircle,
+  Sparkles,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   ResumeBuilderProvider,
@@ -16,6 +27,9 @@ import { ProgressSidebar } from '@/components/resume-builder/ProgressSidebar';
 
 function ResumeChatContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resumeIdParam = searchParams.get('resumeId');
+
   const {
     session,
     messages,
@@ -26,6 +40,7 @@ function ResumeChatContent() {
     error,
     completedResume,
     startSession,
+    joinSession,
     sendMessage,
     generateResume,
     refineMode,
@@ -49,22 +64,26 @@ function ResumeChatContent() {
     setLocalJD(jobDescription);
   }, [jobDescription]);
 
-  // Start session if not exists
+  // Start or join session based on resumeId param
   useEffect(() => {
     if (!session && isConnected && !isLoading) {
-      startSession();
+      if (resumeIdParam) {
+        // Continue existing resume
+        joinSession(resumeIdParam);
+      } else {
+        // Start new session
+        startSession();
+      }
     }
-  }, [session, isConnected, isLoading, startSession]);
+  }, [session, isConnected, isLoading, startSession, joinSession, resumeIdParam]);
 
-  // Scroll to bottom on new messages (but don't steal focus)
+  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages]);
 
-  // BUG FIX: Preserve input focus after AI response completes
   useEffect(() => {
     if (!isStreaming && inputRef.current && document.activeElement !== inputRef.current) {
-      // Only refocus if user hasn't clicked elsewhere
       const activeTag = document.activeElement?.tagName;
       if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA' && activeTag !== 'BUTTON') {
         inputRef.current.focus();
@@ -192,10 +211,11 @@ function ResumeChatContent() {
               {/* Refinement Toggle */}
               <button
                 onClick={() => setRefineMode(!refineMode)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${refineMode
-                  ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  refineMode
+                    ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
                 title={refineMode ? 'AI will rewrite for ATS' : 'AI will store as-is'}
               >
                 <Sparkles className="h-3.5 w-3.5" />
@@ -205,14 +225,19 @@ function ResumeChatContent() {
               {/* JD Toggle */}
               <button
                 onClick={() => setShowJDPanel(!showJDPanel)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${jobDescription
-                  ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  jobDescription
+                    ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
               >
                 <FileText className="h-3.5 w-3.5" />
                 <span>JD</span>
-                {showJDPanel ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {showJDPanel ? (
+                  <ChevronUp className="h-3 w-3" />
+                ) : (
+                  <ChevronDown className="h-3 w-3" />
+                )}
               </button>
 
               {/* Connection Status */}

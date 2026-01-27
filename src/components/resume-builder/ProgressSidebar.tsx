@@ -2,90 +2,87 @@
 
 import { Check, Circle, ArrowRight } from 'lucide-react';
 import {
-    SECTION_ORDER,
-    SECTION_LABELS,
-    REQUIRED_SECTIONS,
-    type ResumeSection,
+  SECTION_ORDER,
+  SECTION_LABELS,
+  REQUIRED_SECTIONS,
+  type ResumeSection,
 } from '@/providers/ResumeBuilderProvider';
 
 interface ProgressSidebarProps {
-    currentSection: ResumeSection;
-    completedSections: ResumeSection[];
-    className?: string;
+  currentSection: ResumeSection;
+  completedSections: ResumeSection[];
+  className?: string;
 }
 
 export function ProgressSidebar({
-    currentSection,
-    completedSections,
-    className = '',
+  currentSection,
+  completedSections,
+  className = '',
 }: ProgressSidebarProps) {
-    return (
-        <aside className={`w-64 shrink-0 ${className}`}>
-            <div className="rounded-xl border border-border bg-card p-4">
-                <h3 className="mb-4 text-sm font-semibold text-foreground">Progress</h3>
-                <nav className="space-y-1">
-                    {SECTION_ORDER.map((section) => {
-                        const isCompleted = completedSections.includes(section);
-                        const isCurrent = section === currentSection;
-                        const isRequired = REQUIRED_SECTIONS.includes(section);
+  return (
+    <aside className={`w-64 shrink-0 ${className}`}>
+      <div className="rounded-xl border border-border bg-card p-4">
+        <h3 className="mb-4 text-sm font-semibold text-foreground">Progress</h3>
+        <nav className="space-y-1">
+          {SECTION_ORDER.map((section) => {
+            const isCompleted = completedSections.includes(section);
+            const isCurrent = section === currentSection;
+            const isRequired = REQUIRED_SECTIONS.includes(section);
 
-                        return (
-                            <div
-                                key={section}
-                                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${isCurrent
-                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                        : isCompleted
-                                            ? 'text-muted-foreground'
-                                            : 'text-muted-foreground/60'
-                                    }`}
-                            >
-                                {/* Status icon */}
-                                <div className="flex h-5 w-5 shrink-0 items-center justify-center">
-                                    {isCompleted ? (
-                                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
-                                            <Check className="h-3 w-3" />
-                                        </div>
-                                    ) : isCurrent ? (
-                                        <ArrowRight className="h-4 w-4 text-emerald-500" />
-                                    ) : (
-                                        <Circle className="h-4 w-4" />
-                                    )}
-                                </div>
-
-                                {/* Label */}
-                                <span className={isCurrent ? 'font-medium' : ''}>
-                                    {SECTION_LABELS[section]}
-                                </span>
-
-                                {/* Required badge */}
-                                {!isRequired && (
-                                    <span className="ml-auto text-xs text-muted-foreground/50">
-                                        Optional
-                                    </span>
-                                )}
-                            </div>
-                        );
-                    })}
-                </nav>
-
-                {/* Completion status */}
-                <div className="mt-4 border-t border-border pt-4">
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Completed</span>
-                        <span className="font-medium text-foreground">
-                            {completedSections.length} / {REQUIRED_SECTIONS.length}
-                        </span>
+            return (
+              <div
+                key={section}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                  isCurrent
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                    : isCompleted
+                      ? 'text-muted-foreground'
+                      : 'text-muted-foreground/60'
+                }`}
+              >
+                {/* Status icon */}
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                  {isCompleted ? (
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
+                      <Check className="h-3 w-3" />
                     </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                        <div
-                            className="h-full bg-emerald-500 transition-all duration-300"
-                            style={{
-                                width: `${(completedSections.filter((s) => REQUIRED_SECTIONS.includes(s)).length / REQUIRED_SECTIONS.length) * 100}%`,
-                            }}
-                        />
-                    </div>
+                  ) : isCurrent ? (
+                    <ArrowRight className="h-4 w-4 text-emerald-500" />
+                  ) : (
+                    <Circle className="h-4 w-4" />
+                  )}
                 </div>
-            </div>
-        </aside>
-    );
+
+                {/* Label */}
+                <span className={isCurrent ? 'font-medium' : ''}>{SECTION_LABELS[section]}</span>
+
+                {/* Required badge */}
+                {!isRequired && (
+                  <span className="ml-auto text-xs text-muted-foreground/50">Optional</span>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Completion status */}
+        <div className="mt-4 border-t border-border pt-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Completed</span>
+            <span className="font-medium text-foreground">
+              {completedSections.length} / {REQUIRED_SECTIONS.length}
+            </span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full bg-emerald-500 transition-all duration-300"
+              style={{
+                width: `${(completedSections.filter((s) => REQUIRED_SECTIONS.includes(s)).length / REQUIRED_SECTIONS.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
 }
