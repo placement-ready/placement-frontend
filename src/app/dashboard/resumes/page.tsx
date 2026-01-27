@@ -112,7 +112,7 @@ export default function ResumesPage() {
   };
 
   const handleEdit = (sessionId: string) => {
-    router.push(`/dashboard/resume-builder/chat?sessionId=${sessionId}`);
+    router.push(`/dashboard/resume-builder/chat?resumeId=${sessionId}`);
   };
 
   const formatDate = (dateStr: string) => {

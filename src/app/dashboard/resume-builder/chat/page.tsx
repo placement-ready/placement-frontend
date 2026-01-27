@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   Pencil,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,8 +39,6 @@ function ResumeChatContent() {
     isConnected,
     isLoading,
     error,
-    completedResume,
-    startSession,
     joinSession,
     sendMessage,
     generateResume,
@@ -55,27 +54,35 @@ function ResumeChatContent() {
   const [localJD, setLocalJD] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [wasGenerated, setWasGenerated] = useState(false);
+  const [hasEditsSinceGeneration, setHasEditsSinceGeneration] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const sessionStartedRef = useRef(false);
 
   // Sync local JD with context
   useEffect(() => {
     setLocalJD(jobDescription);
   }, [jobDescription]);
 
-  // Start or join session based on resumeId param
   useEffect(() => {
-    if (!session && isConnected && !isLoading) {
-      if (resumeIdParam) {
-        // Continue existing resume
-        joinSession(resumeIdParam);
-      } else {
-        // Start new session
-        startSession();
+    if (!session && isConnected && !isLoading && !sessionStartedRef.current) {
+      if (!resumeIdParam) {
+        router.replace('/dashboard/resume-builder');
+        return;
       }
+      sessionStartedRef.current = true;
+      joinSession(resumeIdParam);
     }
-  }, [session, isConnected, isLoading, startSession, joinSession, resumeIdParam]);
+  }, [session, isConnected, isLoading, joinSession, resumeIdParam, router]);
+
+  useEffect(() => {
+    if (session?.sessionId && !resumeIdParam) {
+      const newUrl = `/dashboard/resume-builder/chat?resumeId=${session.sessionId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [session?.sessionId, resumeIdParam]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -91,12 +98,12 @@ function ResumeChatContent() {
     }
   }, [isStreaming]);
 
-  // Navigate to complete page when resume is ready
+  // Track if resume was previously generated (to show regenerate prompt)
   useEffect(() => {
-    if (completedResume) {
-      router.push('/dashboard/resume-builder/complete');
+    if (session?.status === 'completed' || session?.status === 'reviewing') {
+      setWasGenerated(true);
     }
-  }, [completedResume, router]);
+  }, [session?.status]);
 
   // Focus title input when editing starts
   useEffect(() => {
@@ -112,6 +119,20 @@ function ResumeChatContent() {
     sendMessage(inputValue);
     setInputValue('');
     inputRef.current?.focus();
+    // Track if edits are made after resume was generated
+    if (wasGenerated) {
+      setHasEditsSinceGeneration(true);
+    }
+  };
+
+  // Handle generate and navigate to complete page
+  const handleGenerateAndNavigate = () => {
+    generateResume();
+    setHasEditsSinceGeneration(false);
+    // Navigate after a short delay to let generation start
+    setTimeout(() => {
+      router.push(`/dashboard/resume-builder/complete?resumeId=${session?.sessionId}`);
+    }, 500);
   };
 
   // Handle key press
@@ -316,8 +337,32 @@ function ResumeChatContent() {
           </div>
         </div>
 
+        {/* Regenerate Banner - shown when resume was previously generated and user is editing */}
+        {wasGenerated && (
+          <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2">
+            <div className="mx-auto flex max-w-3xl items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                <RefreshCw className="h-4 w-4" />
+                <span className="text-sm">
+                  {hasEditsSinceGeneration
+                    ? "You've made changes. Regenerate to update your resume."
+                    : 'This resume was previously generated. Make edits or regenerate.'}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleGenerateAndNavigate}
+                disabled={isLoading}
+                className="bg-amber-600 text-white hover:bg-amber-500"
+              >
+                {hasEditsSinceGeneration ? 'Regenerate' : 'View Resume'}
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Generate button when ready */}
-        {isReadyToGenerate && (
+        {isReadyToGenerate && !wasGenerated && (
           <div className="border-t border-border bg-emerald-500/5 px-4 py-3">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
               <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
@@ -325,7 +370,7 @@ function ResumeChatContent() {
                 <span className="text-sm font-medium">All required sections complete!</span>
               </div>
               <Button
-                onClick={generateResume}
+                onClick={handleGenerateAndNavigate}
                 disabled={isLoading}
                 className="bg-emerald-600 text-white hover:bg-emerald-500"
               >

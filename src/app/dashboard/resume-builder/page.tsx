@@ -62,10 +62,11 @@ function ResumeBuilderLandingContent() {
 
   // Navigate to chat when session starts
   useEffect(() => {
-    if (session && !isLoading) {
-      router.push('/dashboard/resume-builder/chat');
+    if (session?.sessionId && !isLoading) {
+      // Navigate to chat with the sessionId so it joins the existing session
+      router.push(`/dashboard/resume-builder/chat?resumeId=${session.sessionId}`);
     }
-  }, [session, isLoading, router]);
+  }, [session?.sessionId, isLoading, router]);
 
   const handleStart = () => {
     startSession();
@@ -73,7 +74,7 @@ function ResumeBuilderLandingContent() {
 
   const handleResume = () => {
     if (recentResumes.length > 0) {
-      router.push(`/dashboard/resume-builder/chat?sessionId=${recentResumes[0].sessionId}`);
+      router.push(`/dashboard/resume-builder/chat?resumeId=${recentResumes[0].sessionId}`);
     }
   };
 

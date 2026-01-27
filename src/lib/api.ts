@@ -77,6 +77,22 @@ class ApiClient {
   async delete<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'DELETE' });
   }
+
+  // Special method for downloading binary files (PDFs, images, etc.)
+  async getBlob(path: string): Promise<Blob> {
+    const url = `${this.baseUrl}${path}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Download failed' }));
+      throw new ApiError(errorData.message || 'Download failed', response.status);
+    }
+
+    return response.blob();
+  }
 }
 
 export const api = new ApiClient();
