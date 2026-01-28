@@ -100,7 +100,7 @@ function ResumeChatContent() {
 
   // Track if resume was previously generated (to show regenerate prompt)
   useEffect(() => {
-    if (session?.status === 'completed' || session?.status === 'reviewing') {
+    if (session?.status === 'completed') {
       setWasGenerated(true);
     }
   }, [session?.status]);
@@ -232,10 +232,11 @@ function ResumeChatContent() {
               {/* Refinement Toggle */}
               <button
                 onClick={() => setRefineMode(!refineMode)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${refineMode
-                  ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  refineMode
+                    ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
                 title={refineMode ? 'AI will rewrite for ATS' : 'AI will store as-is'}
               >
                 <Sparkles className="h-3.5 w-3.5" />
@@ -245,10 +246,11 @@ function ResumeChatContent() {
               {/* JD Toggle */}
               <button
                 onClick={() => setShowJDPanel(!showJDPanel)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${jobDescription
-                  ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  jobDescription
+                    ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
               >
                 <FileText className="h-3.5 w-3.5" />
                 <span>JD</span>

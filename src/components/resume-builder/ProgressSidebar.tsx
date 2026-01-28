@@ -43,12 +43,13 @@ export function ProgressSidebar({
                 key={section}
                 onClick={() => handleSectionClick(section)}
                 disabled={!isClickable}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${isCurrent
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
+                  isCurrent
                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                     : isCompleted
                       ? 'text-muted-foreground hover:bg-muted/50'
                       : 'text-muted-foreground/60 hover:bg-muted/30'
-                  } ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+                } ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 {/* Status icon */}
                 <div className="flex h-5 w-5 shrink-0 items-center justify-center">

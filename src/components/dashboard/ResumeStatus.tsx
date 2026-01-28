@@ -105,8 +105,8 @@ const ResumeStatus = () => {
             status,
           };
         });
-
-        setResumeSteps(steps);
+        const limitedSteps = steps.slice(0, 3);
+        setResumeSteps(limitedSteps);
 
         // Use the progress from API or calculate from completed sections
         const progress =
