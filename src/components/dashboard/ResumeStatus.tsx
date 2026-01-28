@@ -2,6 +2,7 @@
 
 import type { ComponentType, SVGProps } from 'react';
 
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, FileText, Loader2 } from 'lucide-react';
@@ -10,26 +11,42 @@ import { NoResumeState } from '@/components/empty-states/NoResumeState';
 import { cn } from '@/lib/utils';
 import { DashboardCard, DashboardCardFooter, DashboardCardSection } from './DashboardCard';
 import { fadeInUp } from './motion';
+import { api } from '@/lib/api';
+import { useAuth } from '@/providers/AuthProvider';
 
-const resumeSteps = [
-  {
-    id: 'summary',
-    label: 'Professional summary',
-    status: 'complete',
-  },
-  {
-    id: 'experience',
-    label: 'Experience details',
-    status: 'in-progress',
-  },
-  {
-    id: 'skills',
-    label: 'Skills & tooling',
-    status: 'pending',
-  },
-];
+// Section definitions matching the backend/provider
+const REQUIRED_SECTIONS = ['personalInfo', 'summary', 'experience', 'education', 'skills'] as const;
 
-const progressPercentage = 68;
+const SECTION_LABELS: Record<string, string> = {
+  personalInfo: 'Personal Information',
+  summary: 'Professional Summary',
+  experience: 'Work Experience',
+  education: 'Education',
+  skills: 'Skills',
+};
+
+interface Resume {
+  id: string;
+  sessionId: string;
+  title: string;
+  status: string;
+  progress: number;
+  completedSections?: string[];
+  currentSection?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ResumeResponse {
+  success: boolean;
+  resumes: Resume[];
+}
+
+interface ResumeStep {
+  id: string;
+  label: string;
+  status: 'complete' | 'in-progress' | 'pending';
+}
 
 const statusCopy: Record<
   string,
@@ -53,7 +70,79 @@ const statusCopy: Record<
 };
 
 const ResumeStatus = () => {
-  const hasResume = resumeSteps.length > 0;
+  const { user } = useAuth();
+  const [resume, setResume] = useState<Resume | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [resumeSteps, setResumeSteps] = useState<ResumeStep[]>([]);
+  const [progressPercentage, setProgressPercentage] = useState(0);
+
+  const fetchRecentResume = useCallback(async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.get<ResumeResponse>('/resume/recent?limit=1');
+      if (response.success && response.resumes?.length > 0) {
+        const latestResume = response.resumes[0];
+        setResume(latestResume);
+
+        // Calculate steps and progress from completed sections
+        const completedSections = latestResume.completedSections || [];
+        const currentSection = latestResume.currentSection || 'personalInfo';
+
+        const steps: ResumeStep[] = REQUIRED_SECTIONS.map((section) => {
+          let status: 'complete' | 'in-progress' | 'pending' = 'pending';
+          if (completedSections.includes(section)) {
+            status = 'complete';
+          } else if (section === currentSection) {
+            status = 'in-progress';
+          }
+          return {
+            id: section,
+            label: SECTION_LABELS[section],
+            status,
+          };
+        });
+
+        setResumeSteps(steps);
+
+        // Use the progress from API or calculate from completed sections
+        const progress =
+          latestResume.progress ||
+          Math.round((completedSections.length / REQUIRED_SECTIONS.length) * 100);
+        setProgressPercentage(progress);
+      }
+    } catch {
+      // Silently fail - just show empty state
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchRecentResume();
+  }, [fetchRecentResume]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <DashboardCard
+        heading="Resume status"
+        subheading="Keep your profile ready with the latest achievements."
+        variants={fadeInUp}
+      >
+        <DashboardCardSection className="gap-6">
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
+          </div>
+        </DashboardCardSection>
+      </DashboardCard>
+    );
+  }
+
+  const hasResume = resume !== null && resumeSteps.length > 0;
 
   return (
     <DashboardCard
@@ -106,7 +195,10 @@ const ResumeStatus = () => {
           </DashboardCardSection>
           <DashboardCardFooter className="px-0 pb-0">
             <Button asChild size="sm">
-              <Link href="/dashboard/resume-builder" className="flex items-center">
+              <Link
+                href={`/dashboard/resume-builder/chat?resumeId=${resume.sessionId}`}
+                className="flex items-center"
+              >
                 Continue editing
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

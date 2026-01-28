@@ -44,6 +44,7 @@ export default function ResumesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const fetchResumes = useCallback(async () => {
     if (!user?.id) return;
@@ -115,6 +116,30 @@ export default function ResumesPage() {
     router.push(`/dashboard/resume-builder/chat?resumeId=${sessionId}`);
   };
 
+  const handlePreview = (sessionId: string) => {
+    router.push(`/dashboard/resume-builder/complete?resumeId=${sessionId}`);
+  };
+
+  const handleDownload = async (resume: Resume) => {
+    try {
+      setDownloadingId(resume.sessionId);
+      const blob = await api.getBlob(`/resume-export/${resume.sessionId}/download`);
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${resume.title || 'Resume'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setError('Failed to download resume');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
@@ -132,6 +157,11 @@ export default function ResumesPage() {
       default:
         return 'bg-amber-500/10 text-amber-600';
     }
+  };
+
+  // Check if resume is ready for preview/download (has enough content)
+  const canPreviewOrDownload = (resume: Resume) => {
+    return resume.status === 'completed' || resume.progress >= 60;
   };
 
   if (isLoading) {
@@ -192,7 +222,7 @@ export default function ResumesPage() {
           <AnimatePresence>
             {resumes.map((resume, index) => (
               <motion.div
-                key={resume.id}
+                key={resume.sessionId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -200,7 +230,7 @@ export default function ResumesPage() {
                 className="group relative rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-lg"
               >
                 {/* Delete confirmation overlay */}
-                {deletingId === resume.id && (
+                {deletingId === resume.sessionId && (
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-background/95 p-4">
                     <p className="mb-4 text-center text-sm text-foreground">Delete this resume?</p>
                     <div className="flex gap-2">
@@ -220,7 +250,7 @@ export default function ResumesPage() {
 
                 {/* Title */}
                 <div className="mb-3">
-                  {editingId === resume.id ? (
+                  {editingId === resume.sessionId ? (
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -252,7 +282,7 @@ export default function ResumesPage() {
                       <button
                         onClick={() => {
                           setEditedTitle(resume.title);
-                          setEditingId(resume.id);
+                          setEditingId(resume.sessionId);
                         }}
                         className="rounded p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                         title="Rename"
@@ -299,25 +329,41 @@ export default function ResumesPage() {
                     Edit
                   </Button>
                   <button
-                    onClick={() => setDeletingId(resume.id)}
+                    onClick={() => setDeletingId(resume.sessionId)}
                     className="rounded p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                   <button
-                    className="cursor-not-allowed rounded p-2 text-muted-foreground opacity-50"
-                    title="Preview (coming soon)"
-                    disabled
+                    onClick={() => handlePreview(resume.sessionId)}
+                    disabled={!canPreviewOrDownload(resume)}
+                    className={`rounded p-2 transition-colors ${
+                      canPreviewOrDownload(resume)
+                        ? 'text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600'
+                        : 'cursor-not-allowed text-muted-foreground opacity-50'
+                    }`}
+                    title={canPreviewOrDownload(resume) ? 'Preview' : 'Complete resume to preview'}
                   >
                     <Eye className="h-4 w-4" />
                   </button>
                   <button
-                    className="cursor-not-allowed rounded p-2 text-muted-foreground opacity-50"
-                    title="Download (coming soon)"
-                    disabled
+                    onClick={() => handleDownload(resume)}
+                    disabled={!canPreviewOrDownload(resume) || downloadingId === resume.sessionId}
+                    className={`rounded p-2 transition-colors ${
+                      canPreviewOrDownload(resume)
+                        ? 'text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600'
+                        : 'cursor-not-allowed text-muted-foreground opacity-50'
+                    }`}
+                    title={
+                      canPreviewOrDownload(resume) ? 'Download PDF' : 'Complete resume to download'
+                    }
                   >
-                    <Download className="h-4 w-4" />
+                    {downloadingId === resume.sessionId ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </motion.div>

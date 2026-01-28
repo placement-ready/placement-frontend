@@ -232,11 +232,10 @@ function ResumeChatContent() {
               {/* Refinement Toggle */}
               <button
                 onClick={() => setRefineMode(!refineMode)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  refineMode
-                    ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${refineMode
+                  ? 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/30'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
                 title={refineMode ? 'AI will rewrite for ATS' : 'AI will store as-is'}
               >
                 <Sparkles className="h-3.5 w-3.5" />
@@ -246,11 +245,10 @@ function ResumeChatContent() {
               {/* JD Toggle */}
               <button
                 onClick={() => setShowJDPanel(!showJDPanel)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  jobDescription
-                    ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${jobDescription
+                  ? 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/30'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
               >
                 <FileText className="h-3.5 w-3.5" />
                 <span>JD</span>
@@ -427,6 +425,25 @@ function ResumeChatContent() {
           currentSection={session.currentSection}
           completedSections={session.completedSections}
           className="hidden lg:block"
+          onSectionClick={(section) => {
+            // Prevent sending while AI is still responding
+            if (isStreaming) return;
+
+            // Send a message to AI to focus on this section
+            const sectionLabels: Record<string, string> = {
+              personalInfo: 'personal information',
+              summary: 'professional summary',
+              experience: 'work experience',
+              education: 'education',
+              skills: 'skills',
+              projects: 'projects',
+              certifications: 'certifications',
+              languages: 'languages',
+              achievements: 'achievements',
+            };
+            const label = sectionLabels[section] || section;
+            sendMessage(`I want to work on my ${label} section.`);
+          }}
         />
       )}
     </div>
