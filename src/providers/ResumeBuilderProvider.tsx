@@ -13,10 +13,6 @@ import {
 import { useSocket } from '@/hooks/useSocket';
 import { useAuth } from './AuthProvider';
 
-// ============================================================
-// TYPES
-// ============================================================
-
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -141,10 +137,6 @@ interface ResumeBuilderContextValue {
 
 const ResumeBuilderContext = createContext<ResumeBuilderContextValue | null>(null);
 
-// ============================================================
-// SECTION METADATA
-// ============================================================
-
 export const SECTION_LABELS: Record<ResumeSection, string> = {
   personalInfo: 'Personal Information',
   summary: 'Professional Summary',
@@ -177,10 +169,6 @@ export const SECTION_ORDER: ResumeSection[] = [
   'achievements',
 ];
 
-// ============================================================
-// PROVIDER COMPONENT
-// ============================================================
-
 interface ResumeBuilderProviderProps {
   children: ReactNode;
 }
@@ -201,7 +189,6 @@ export function ResumeBuilderProvider({ children }: ResumeBuilderProviderProps) 
   const [jobDescription, setJobDescriptionState] = useState('');
   const [resumeList, setResumeList] = useState<ResumeListItem[]>([]);
 
-  // Ref to track current streaming content for token accumulation
   const streamingRef = useRef('');
 
   // Set up socket event listeners
@@ -480,7 +467,6 @@ export function ResumeBuilderProvider({ children }: ResumeBuilderProviderProps) 
   const setJobDescription = useCallback(
     (jd: string) => {
       setJobDescriptionState(jd);
-      // Also update on backend if session exists
       if (session?.sessionId) {
         emit('resume:updateJD', { sessionId: session.sessionId, jobDescription: jd });
       }

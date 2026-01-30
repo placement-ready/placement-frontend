@@ -14,7 +14,6 @@ import { fadeInUp } from './motion';
 import { api } from '@/lib/api';
 import { useAuth } from '@/providers/AuthProvider';
 
-// Section definitions matching the backend/provider
 const REQUIRED_SECTIONS = ['personalInfo', 'summary', 'experience', 'education', 'skills'] as const;
 
 const SECTION_LABELS: Record<string, string> = {
