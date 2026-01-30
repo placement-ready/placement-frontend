@@ -6,6 +6,7 @@ import QuickActions from '@/components/dashboard/QuickActions';
 import RecentInterviews from '@/components/dashboard/RecentInterviews';
 import ResumeStatus from '@/components/dashboard/ResumeStatus';
 import WelcomeHeader from '@/components/dashboard/WelcomeHeader';
+import InterviewStats from '@/components/dashboard/InterviewStats';
 import { staggerContainer } from '@/components/dashboard/motion';
 
 export default function Dashboard() {
@@ -17,10 +18,14 @@ export default function Dashboard() {
       variants={staggerContainer}
     >
       <WelcomeHeader />
+
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <QuickActions />
         <ResumeStatus />
       </div>
+
+      <InterviewStats />
+
       <RecentInterviews />
     </motion.div>
   );

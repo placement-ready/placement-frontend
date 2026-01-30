@@ -1,11 +1,42 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Loader2, Sparkles, Calendar, Clock, Target } from 'lucide-react';
+import { env } from '@/config';
 
 const steps = [
-  { label: 'Candidate Details', detail: 'Confirm who we are meeting with.' },
-  { label: 'Availability', detail: 'Pick a slot that works for you.' },
-  { label: 'Interview Brief', detail: 'We send prep materials instantly.' },
+  { label: 'Choose Type', detail: 'Select your interview focus.' },
+  { label: 'Set Duration', detail: 'Pick how long you want to practice.' },
+  { label: 'Start Session', detail: 'Jump into your AI-powered interview.' },
+];
+
+const interviewTypes = [
+  {
+    id: 'behavioral',
+    title: 'Behavioral',
+    description: 'Practice STAR method responses and soft skills questions.',
+    icon: Target,
+  },
+  {
+    id: 'technical',
+    title: 'Technical',
+    description: 'System design, debugging, and technical communication.',
+    icon: Sparkles,
+  },
+  {
+    id: 'case-study',
+    title: 'Case Study',
+    description: 'Business analysis and problem-solving scenarios.',
+    icon: Calendar,
+  },
+];
+
+const durations = [
+  { value: 15, label: '15 min', description: 'Quick practice' },
+  { value: 30, label: '30 min', description: 'Standard session' },
+  { value: 45, label: '45 min', description: 'Deep dive' },
 ];
 
 const focusTips = [
@@ -14,257 +45,253 @@ const focusTips = [
   'Keep answers concise and structured.',
 ];
 
-const availabilityWindows = [
-  { day: 'Today', slot: '2:00 PM – 3:00 PM' },
-  { day: 'Tomorrow', slot: '10:00 AM – 11:00 AM' },
-  { day: 'Friday', slot: '4:00 PM – 5:00 PM' },
-];
+export default function ScheduleInterview() {
+  const router = useRouter();
+  const [selectedType, setSelectedType] = useState('behavioral');
+  const [selectedDuration, setSelectedDuration] = useState(30);
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const ScheduleInterview: React.FC = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const handleStartInterview = async () => {
+    setIsCreating(true);
+    setError(null);
 
-  const completion = useMemo(() => {
-    const completedFields = [name, email, date, time].filter(Boolean).length;
-    return Math.round((completedFields / 4) * 100);
-  }, [name, email, date, time]);
+    try {
+      const response = await fetch(`${env.apiUrl}/interviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          type: selectedType,
+          duration: selectedDuration,
+          title: `${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Interview Practice`,
+        }),
+      });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true); // for demo, replace with actual API call
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create interview');
+      }
+
+      // Start the interview session
+      const startResponse = await fetch(
+        `${env.apiUrl}/interviews/${data.interview.sessionId}/start`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        },
+      );
+
+      if (!startResponse.ok) {
+        const startData = await startResponse.json();
+        throw new Error(startData.message || 'Failed to start interview');
+      }
+
+      // Redirect to interview room
+      router.push(`/dashboard/interview/room?session=${data.interview.sessionId}`);
+    } catch (err: unknown) {
+      console.error('Error creating interview:', err);
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to create interview. Please try again.';
+      setError(errorMessage);
+      setIsCreating(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-16">
-      <div className="bg-linear-to-b from-emerald-100/20 via-transparent to-transparent dark:from-emerald-900/20">
-        <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-10 pt-12 text-white sm:px-6">
+    <div className="min-h-screen pb-16">
+      <div className="bg-linear-to-b from-emerald-50/50 via-transparent to-transparent dark:from-emerald-900/10">
+        <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-10 pt-8 sm:px-6">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
               Interview Setup
             </div>
             <div className="space-y-3">
-              <h1 className="text-3xl font-semibold leading-tight text-emerald-50 sm:text-4xl">
-                Line up your next session in under two minutes
+              <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+                Start a practice session
               </h1>
-              <p className="max-w-2xl text-base text-emerald-100/90">
-                Share your availability, and we will lock in the right mentor with the right brief.
-                No distractions, only the essentials.
+              <p className="max-w-2xl text-base text-muted-foreground">
+                Choose your interview type and duration. Our AI interviewer will guide you through
+                realistic questions and provide instant feedback.
               </p>
-            </div>
-            <div className="flex flex-wrap gap-4 text-xs text-emerald-200">
-              <span className="rounded-full border border-emerald-400/30 px-3 py-1">
-                Live mock CIO interviews
-              </span>
-              <span className="rounded-full border border-emerald-400/30 px-3 py-1">
-                Structured feedback
-              </span>
-              <span className="rounded-full border border-emerald-400/30 px-3 py-1">
-                Calendar ready invite
-              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-5xl gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        {/* Form Column */}
+      <div className="mx-auto grid max-w-5xl gap-6 px-4 sm:px-6 lg:grid-cols-[1.7fr_1fr]">
+        {/* Main Form Column */}
+
         <div className="space-y-6">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.45)] backdrop-blur">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-emerald-300/70">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Step 1 of 2
                 </p>
-                <h2 className="mt-1 text-xl font-semibold text-white">Confirm interview details</h2>
-              </div>
-              <div className="rounded-full border border-emerald-500/40 px-4 py-1 text-xs font-medium text-emerald-200">
-                GMT +05:30 · Google Meet
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-300">
-                <span>Progress</span>
-                <span className="text-emerald-300">{completion}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-linear-to-r from-emerald-500 to-green-400 transition-[width] duration-300"
-                  style={{ width: `${completion}%` }}
-                />
+                <h2 className="mt-1 text-xl font-semibold text-foreground">
+                  Choose interview type
+                </h2>
+                <h2 className="mt-1 text-xl font-semibold text-foreground">
+                  Choose interview type
+                </h2>
               </div>
             </div>
 
-            {submitted ? (
-              <div className="mt-8 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-6 text-center text-sm text-emerald-100">
-                <p className="text-base font-semibold text-emerald-200">Interview scheduled</p>
-                <p className="mt-2 text-emerald-100/90">
-                  We sent the calendar invite and prep notes to <strong>{email}</strong>. Feel free
-                  to adjust the slot anytime.
-                </p>
-              </div>
-            ) : (
-              <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-200" htmlFor="name">
-                      Full Name
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="Nora Jensen"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-200" htmlFor="email">
-                      Email Address
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="nora@hiremind.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-200" htmlFor="date">
-                      Preferred Date
-                    </label>
-                    <input
-                      id="date"
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-200" htmlFor="time">
-                      Time Window
-                    </label>
-                    <input
-                      id="time"
-                      type="time"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/20 p-5 text-sm text-slate-300">
-                  <p className="font-medium text-emerald-200">What happens next?</p>
-                  <ul className="mt-3 space-y-2 text-xs text-slate-400">
-                    <li>• We pair you with the best mentor for the role.</li>
-                    <li>• You get a calendar invite, prep doc, and reminders.</li>
-                    <li>• Join a distraction-free room with built-in timer + notes.</li>
-                  </ul>
-                </div>
-
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {interviewTypes.map((type) => (
                 <button
-                  type="submit"
-                  disabled={!name || !email || !date || !time}
-                  className="w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-400 px-6 py-4 text-center text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:shadow-[0_20px_35px_rgba(34,197,94,0.25)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                  key={type.id}
+                  onClick={() => setSelectedType(type.id)}
+                  className={`rounded-xl border p-4 text-left transition-all ${
+                    selectedType === type.id
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
+                      : 'border-border hover:border-emerald-200 dark:hover:border-emerald-500/30'
+                  }`}
                 >
-                  Lock Interview Slot
+                  <type.icon
+                    className={`h-5 w-5 ${
+                      selectedType === type.id
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-muted-foreground'
+                    }`}
+                  />
+                  <p className="mt-2 font-semibold text-foreground">{type.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{type.description}</p>
                 </button>
-              </form>
-            )}
-          </div>
-
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-              Focus tips
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">
-              {focusTips.map((tip) => (
-                <li key={tip} className="flex items-start gap-3">
-                  <span className="mt-1 inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  <span>{tip}</span>
-                </li>
               ))}
-            </ul>
-          </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Step 2 of 2
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">Select duration</h2>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {durations.map((duration) => (
+                <button
+                  key={duration.value}
+                  onClick={() => setSelectedDuration(duration.value)}
+                  className={`rounded-xl border p-4 text-left transition-all ${
+                    selectedDuration === duration.value
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
+                      : 'border-border hover:border-emerald-200 dark:hover:border-emerald-500/30'
+                  }`}
+                >
+                  <Clock
+                    className={`h-5 w-5 ${
+                      selectedDuration === duration.value
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-muted-foreground'
+                    }`}
+                  />
+                  <p className="mt-2 font-semibold text-foreground">{duration.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{duration.description}</p>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive"
+            >
+              {error}
+            </motion.div>
+          )}
+
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            onClick={handleStartInterview}
+            disabled={isCreating || !selectedType || !selectedDuration}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-emerald-500 px-6 py-4 text-center text-sm font-semibold uppercase tracking-wide text-white transition hover:shadow-lg focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Creating Session...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Start Interview Now
+              </>
+            )}
+          </motion.button>
         </div>
 
         {/* Secondary Column */}
         <div className="space-y-6">
-          <div className="rounded-2xl border border-emerald-500/30 bg-linear-to-b from-emerald-700/10 via-slate-900 to-slate-950 p-5 text-sm text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-              Setup flow
+          <div className="rounded-2xl border border-emerald-200 bg-linear-to-b from-emerald-50 to-transparent p-5 dark:border-emerald-500/20 dark:from-emerald-500/10">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+              How it works
             </p>
             <ul className="mt-4 space-y-4">
               {steps.map((step, index) => (
                 <li key={step.label} className="flex gap-4">
                   <div className="relative flex flex-col items-center">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-400/60 text-[11px] font-semibold text-emerald-200">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-400/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
                       {index + 1}
                     </span>
-                    {index !== steps.length - 1 && <span className="my-1 h-6 w-px bg-slate-700" />}
+                    {index !== steps.length - 1 && (
+                      <span className="my-1 h-6 w-px bg-emerald-200 dark:bg-emerald-500/30" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{step.label}</p>
-                    <p className="text-xs text-slate-400">{step.detail}</p>
+                    <p className="text-sm font-semibold text-foreground">{step.label}</p>
+                    <p className="text-xs text-muted-foreground">{step.detail}</p>
                   </div>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
-              <span>Quick picks</span>
-              <span className="text-emerald-300">Fastest</span>
-            </div>
-            <div className="mt-4 space-y-3">
-              {availabilityWindows.map((slot) => (
-                <div
-                  key={`${slot.day}-${slot.slot}`}
-                  className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/30 px-4 py-3 text-sm text-slate-200"
-                >
-                  <div>
-                    <p className="font-medium text-white">{slot.day}</p>
-                    <p className="text-xs text-slate-400">{slot.slot}</p>
-                  </div>
-                  <button
-                    type="button"
-                    className="rounded-full border border-emerald-500/50 px-4 py-1 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/10"
-                  >
-                    Autofill
-                  </button>
-                </div>
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Focus tips
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-foreground/80">
+              {focusTips.map((tip) => (
+                <li key={tip} className="flex items-start gap-3">
+                  <span className="mt-1.5 inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                  <span>{tip}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/30 p-5 text-xs text-slate-400">
-            <p className="text-sm font-semibold text-white">Need a different format?</p>
-            <p className="mt-2">
-              Chat with our coordinator for panel interviews, presentation-based loops, or niche
-              roles. We reply in under 10 minutes.
+          <div className="rounded-2xl border border-border bg-muted/30 p-5 text-sm">
+            <p className="font-semibold text-foreground">Need a specific focus?</p>
+            <p className="mt-2 text-muted-foreground">
+              After completing a few sessions, we&apos;ll personalize your practice based on areas
+              that need improvement.
             </p>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default ScheduleInterview;
+}

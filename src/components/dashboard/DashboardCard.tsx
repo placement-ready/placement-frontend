@@ -16,7 +16,7 @@ interface DashboardCardProps extends Omit<React.ComponentProps<typeof MotionCard
 }
 
 const baseCardClasses =
-  'border border-slate-200/80 bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/80';
+  'border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50';
 
 export function DashboardCard({
   heading,
@@ -38,12 +38,16 @@ export function DashboardCard({
       {...motionProps}
     >
       {(heading || subheading || action) && (
-        <div className="flex items-start justify-between gap-4 border-b border-border/60 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200/60 px-6 py-5 dark:border-slate-800/60">
           <div className="space-y-1">
             {heading ? (
-              <h2 className="text-base font-semibold text-foreground sm:text-lg">{heading}</h2>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">
+                {heading}
+              </h2>
             ) : null}
-            {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
+            {subheading ? (
+              <p className="text-sm text-slate-600 dark:text-slate-400">{subheading}</p>
+            ) : null}
           </div>
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
@@ -63,7 +67,7 @@ export function DashboardCardFooter({ className, ...props }: React.HTMLAttribute
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-4 border-t border-border/60 px-6 py-4',
+        'flex items-center justify-between gap-4 border-t border-slate-200/60 px-6 py-4 dark:border-slate-800/60',
         className,
       )}
       {...props}

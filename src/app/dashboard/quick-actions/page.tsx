@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import {
   HelpCircle,
   FileText,
@@ -9,16 +10,14 @@ import {
   MessageCircle,
   BarChart3,
   Bookmark,
-  Code2,
   Users,
   Library,
-  ClipboardList,
   TrendingUp,
-  GraduationCap,
   Briefcase,
   Trophy,
   Upload,
   Video,
+  ArrowRight,
 } from 'lucide-react';
 
 interface QuickAction {
@@ -29,195 +28,123 @@ interface QuickAction {
   href: string;
   category: 'learning' | 'assessment' | 'career' | 'collaboration';
   badge?: string;
-  color: string;
 }
 
 const quickActions: QuickAction[] = [
-  // Learning Actions
   {
     id: 'take-assessment',
     title: 'Take Skills Assessment',
     description: 'Evaluate your current skills and get personalized recommendations',
-    icon: <HelpCircle className="w-6 h-6" />,
+    icon: <HelpCircle className="h-6 w-6" />,
     href: '/dashboard/skills-assessment',
     category: 'assessment',
     badge: 'Popular',
-    color: 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100',
   },
   {
     id: 'resume-builder',
     title: 'Build Resume',
     description: 'Create a professional resume with our AI-powered builder',
-    icon: <FileText className="w-6 h-6" />,
-    href: '/resume',
+    icon: <FileText className="h-6 w-6" />,
+    href: '/dashboard/resume-builder',
     category: 'career',
-    color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100',
   },
   {
     id: 'study-planner',
     title: 'Create Study Plan',
     description: 'Generate a personalized study schedule for your goals',
-    icon: <CalendarClock className="w-6 h-6" />,
+    icon: <CalendarClock className="h-6 w-6" />,
     href: '/dashboard/study-planner',
     category: 'learning',
-    color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100',
   },
   {
     id: 'ai-mentor',
     title: 'Chat with AI Mentor',
     description: 'Get instant help and guidance from our AI mentor',
-    icon: <MessageCircle className="w-6 h-6" />,
+    icon: <MessageCircle className="h-6 w-6" />,
     href: '/dashboard/ai-chat',
     category: 'learning',
     badge: 'New',
-    color: 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100',
   },
   {
     id: 'progress-analytics',
     title: 'View Progress',
     description: 'Track your learning progress and achievements',
-    icon: <BarChart3 className="w-6 h-6" />,
+    icon: <BarChart3 className="h-6 w-6" />,
     href: '/dashboard/skill-progress',
     category: 'assessment',
-    color: 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100',
   },
   {
     id: 'save-resources',
     title: 'Browse Resources',
     description: 'Explore curated learning materials and save favorites',
-    icon: <Bookmark className="w-6 h-6" />,
+    icon: <Bookmark className="h-6 w-6" />,
     href: '/dashboard/browse-resources',
     category: 'learning',
-    color: 'bg-pink-50 text-pink-600 border-pink-200 hover:bg-pink-100',
-  },
-  {
-    id: 'coding-practice',
-    title: 'Practice Coding',
-    description: 'Solve coding problems and improve your programming skills',
-    icon: <Code2 className="w-6 h-6" />,
-    href: '/dashboard/dsa',
-    category: 'learning',
-    color: 'bg-cyan-50 text-cyan-600 border-cyan-200 hover:bg-cyan-100',
   },
   {
     id: 'mock-interview',
     title: 'Mock Interview',
     description: 'Practice interviews with AI or connect with mentors',
-    icon: <Video className="w-6 h-6" />,
-    href: '/dashboard/mentor',
+    icon: <Video className="h-6 w-6" />,
+    href: '/dashboard/interview/new',
     category: 'career',
-    color: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
-  },
-  {
-    id: 'learning-paths',
-    title: 'Explore Learning Paths',
-    description: 'Discover structured learning journeys for your career goals',
-    icon: <GraduationCap className="w-6 h-6" />,
-    href: '/dashboard/browse-paths',
-    category: 'learning',
-    color: 'bg-teal-50 text-teal-600 border-teal-200 hover:bg-teal-100',
   },
   {
     id: 'career-goals',
     title: 'Set Career Goals',
     description: 'Define and track your professional objectives',
-    icon: <Briefcase className="w-6 h-6" />,
+    icon: <Briefcase className="h-6 w-6" />,
     href: '/dashboard/career-goals',
     category: 'career',
-    color: 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100',
   },
   {
     id: 'achievements',
     title: 'View Achievements',
     description: 'See your accomplishments and earned badges',
-    icon: <Trophy className="w-6 h-6" />,
+    icon: <Trophy className="h-6 w-6" />,
     href: '/dashboard/achievements',
     category: 'assessment',
-    color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100',
   },
   {
     id: 'upload-content',
     title: 'Upload Resources',
     description: 'Share your own learning materials with the community',
-    icon: <Upload className="w-6 h-6" />,
+    icon: <Upload className="h-6 w-6" />,
     href: '/dashboard/upload',
     category: 'collaboration',
-    color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100',
   },
 ];
 
 const categoryConfig = {
-  learning: { label: 'Learning & Development', icon: <Library className="w-5 h-5" /> },
-  assessment: { label: 'Assessment & Progress', icon: <TrendingUp className="w-5 h-5" /> },
-  career: { label: 'Career Preparation', icon: <Briefcase className="w-5 h-5" /> },
-  collaboration: { label: 'Community & Sharing', icon: <Users className="w-5 h-5" /> },
+  learning: { label: 'Learning & Development', icon: <Library className="h-5 w-5" /> },
+  assessment: { label: 'Assessment & Progress', icon: <TrendingUp className="h-5 w-5" /> },
+  career: { label: 'Career Preparation', icon: <Briefcase className="h-5 w-5" /> },
+  collaboration: { label: 'Community & Sharing', icon: <Users className="h-5 w-5" /> },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
 };
 
 const QuickActionsPage: React.FC = () => {
   const categories = Object.keys(categoryConfig) as Array<keyof typeof categoryConfig>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-transparent">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Quick Actions</h1>
-          <p className="text-gray-600 max-w-2xl">
+          <h1 className="mb-2 text-3xl font-bold text-slate-900 dark:text-white">Quick Actions</h1>
+          <p className="max-w-2xl text-slate-600 dark:text-slate-400">
             Fast-track your learning journey with these essential actions. Get started with the most
             important tasks to advance your career and skills.
           </p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <ClipboardList className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Available Actions</p>
-                <p className="text-2xl font-bold text-gray-900">{quickActions.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Categories</p>
-                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Trophy className="w-6 h-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">New Features</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {quickActions.filter((action) => action.badge === 'New').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Bookmark className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Popular</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {quickActions.filter((action) => action.badge === 'Popular').length}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Actions by Category */}
@@ -227,59 +154,79 @@ const QuickActionsPage: React.FC = () => {
 
           return (
             <div key={category} className="mb-12">
-              <div className="flex items-center mb-6">
-                <div className="flex items-center">
+              <div className="mb-6 flex items-center">
+                <div className="flex items-center text-emerald-600 dark:text-emerald-400">
                   {config.icon}
-                  <h2 className="text-xl font-semibold text-gray-900 ml-2">{config.label}</h2>
+                  <h2 className="ml-2 text-xl font-semibold text-slate-900 dark:text-white">
+                    {config.label}
+                  </h2>
                 </div>
-                <div className="ml-4 px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                <div className="ml-4 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   {categoryActions.length} actions
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <motion.div
+                className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {categoryActions.map((action) => (
-                  <Link
-                    key={action.id}
-                    href={action.href}
-                    className={`block bg-white rounded-xl p-6 border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 ${action.color}`}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="p-3 rounded-lg bg-white shadow-sm">{action.icon}</div>
-                      {action.badge && (
-                        <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
-                          {action.badge}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{action.description}</p>
-                  </Link>
+                  <motion.div key={action.id} variants={itemVariants}>
+                    <Link
+                      href={action.href}
+                      className="group block h-full rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-emerald-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-emerald-500/50"
+                    >
+                      <div className="mb-4 flex items-start justify-between">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:group-hover:bg-emerald-500 dark:group-hover:text-white">
+                          {action.icon}
+                        </div>
+                        {action.badge && (
+                          <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                            {action.badge}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
+                        {action.title}
+                      </h3>
+                      <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {action.description}
+                      </p>
+                      <div className="flex items-center gap-1 text-sm font-medium text-emerald-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-emerald-400">
+                        <span>Get started</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
+                    </Link>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           );
         })}
 
-        {/* Call to Action */}
-        <div className="mt-12 bg-linear-to-r from-green-600 to-blue-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Ready to Accelerate Your Learning?</h2>
-          <p className="text-green-100 mb-6 max-w-2xl mx-auto">
+        {/* CTA Section */}
+        <div className="mt-12 rounded-2xl border border-emerald-200/50 bg-emerald-50/50 p-8 text-center dark:border-emerald-500/20 dark:bg-emerald-500/5">
+          <h2 className="mb-4 text-2xl font-bold text-slate-900 dark:text-white">
+            Ready to Accelerate Your Learning?
+          </h2>
+          <p className="mx-auto mb-6 max-w-2xl text-slate-600 dark:text-slate-400">
             These quick actions are designed to help you make the most of your learning journey.
             Start with any action that aligns with your current goals.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link
               href="/dashboard/skills-assessment"
-              className="px-6 py-3 bg-white text-green-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
             >
               Take Skills Assessment
             </Link>
             <Link
-              href="/dashboard/ai-chat"
-              className="px-6 py-3 bg-green-700 text-white font-semibold rounded-lg hover:bg-green-800 transition-colors border border-green-500"
+              href="/dashboard/interview/new"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 font-semibold text-slate-900 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
             >
-              Chat with AI Mentor
+              Start Mock Interview
             </Link>
           </div>
         </div>

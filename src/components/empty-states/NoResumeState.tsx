@@ -9,7 +9,7 @@ interface NoResumeStateProps {
   actionHref?: string;
 }
 
-export function NoResumeState({ actionHref = '/resume' }: NoResumeStateProps) {
+export function NoResumeState({ actionHref = '/dashboard/resume-builder' }: NoResumeStateProps) {
   return (
     <EmptyState
       title="Resume not created yet"
