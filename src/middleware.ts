@@ -1,29 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const protectedRoutes = ['/dashboard'];
-const authRoutes = ['/auth/login', '/auth/signup'];
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get('hiremind_session_token');
+  const { pathname } = req.nextUrl;
 
-export function middleware(request: NextRequest) {
-  const sessionToken = request.cookies.get('hiremind_session_token');
-  const { pathname } = request.nextUrl;
-
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
-  const isAuthRoute = authRoutes.some((route) => pathname === route);
-
-  if (isProtectedRoute && !sessionToken) {
-    const loginUrl = new URL('/auth/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isAuthRoute && sessionToken) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if ((pathname === '/auth/login' || pathname === '/auth/signup') && token) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ['/dashboard/:path*', '/auth/login', '/auth/signup'],
-};
