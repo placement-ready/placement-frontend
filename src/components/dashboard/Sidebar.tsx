@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/providers/AuthProvider';
@@ -36,7 +36,6 @@ interface SidebarProps {
 export default function Sidebar({ config, isOpen, setIsOpen, className = '' }: SidebarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -63,7 +62,6 @@ export default function Sidebar({ config, isOpen, setIsOpen, className = '' }: S
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/');
   };
 
   const isActive = (href: string) =>

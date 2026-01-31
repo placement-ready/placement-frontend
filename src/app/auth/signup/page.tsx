@@ -3,36 +3,41 @@
 import React from 'react';
 import { Form } from '@/components/auth/AuthForm';
 import { AuthLayout } from '@/components/auth/AuthLayout';
-import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 
 export default function SignupForm() {
-  const router = useRouter();
-
   const handleSubmit = async (email: string, password: string) => {
-    await authClient.signUp.email(
+    if (password.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+
+    const result = await authClient.signUp.email(
       {
         email,
         password,
         name: email.split('@')[0],
-        callbackURL: '/dashboard',
       },
       {
         onSuccess: () => {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         },
         onError: (ctx) => {
-          console.error('Signup error:', ctx.error);
+          const message = ctx.error?.message || 'Failed to create account';
+          throw new Error(message);
         },
       },
     );
+
+    if (result?.error) {
+      throw new Error(result.error.message || 'Failed to create account');
+    }
   };
 
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: 'google',
       callbackURL: '/dashboard',
-      errorCallbackURL: '/auth/signup',
+      errorCallbackURL: '/auth/signup?error=google_failed',
     });
   };
 

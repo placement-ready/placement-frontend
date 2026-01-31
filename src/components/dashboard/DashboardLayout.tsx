@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Bell, Settings, LogOut, User, Menu, X, ChevronDown } from 'lucide-react';
 import Sidebar from './Sidebar';
 import menuItems from './MenuItems';
@@ -19,16 +19,13 @@ export default function Layout({ children }: LayoutProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
-    // Only redirect after auth loading is complete
     if (!isLoading && !isAuthenticated) {
-      router.replace('/');
+      window.location.href = '/auth/login';
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (!(e.target as Element).closest('.profile-dropdown')) {
@@ -39,15 +36,20 @@ export default function Layout({ children }: LayoutProps) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleLogout = async () => {
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
+
+  const handleLogout = useCallback(async () => {
+    setShowProfileMenu(false);
     await signOut();
-    router.push('/');
-  };
+  }, [signOut]);
 
   const getInitials = (name?: string | null) => {
     if (!name) return 'U';
-    const parts = name.split(' ');
-    return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0].toUpperCase();
+    const parts = name.trim().split(' ').filter(Boolean);
+    if (parts.length === 0) return 'U';
+    return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0][0].toUpperCase();
   };
 
   const getPageTitle = () => {
@@ -68,9 +70,15 @@ export default function Layout({ children }: LayoutProps) {
     );
   }
 
-  // Don't render dashboard if not authenticated (will redirect)
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="flex min-h-screen flex-1 items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Redirecting to login...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

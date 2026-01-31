@@ -3,31 +3,38 @@
 import React from 'react';
 import { Form } from '@/components/auth/AuthForm';
 import { AuthLayout } from '@/components/auth/AuthLayout';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { Suspense } from 'react';
 
-export default function LoginForm() {
-  const router = useRouter();
+function LoginFormContent() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (email: string, password: string) => {
-    await authClient.signIn.email(
-      { email, password, callbackURL: '/dashboard' },
+    const result = await authClient.signIn.email(
+      { email, password },
       {
         onSuccess: () => {
-          router.push('/dashboard');
+          window.location.href = redirectTo;
         },
         onError: (ctx) => {
-          console.error('Login error:', ctx.error);
+          const message = ctx.error?.message || 'Invalid email or password';
+          throw new Error(message);
         },
       },
     );
+
+    if (result?.error) {
+      throw new Error(result.error.message || 'Invalid email or password');
+    }
   };
 
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: 'google',
       callbackURL: '/dashboard',
-      errorCallbackURL: '/auth/login',
+      errorCallbackURL: '/auth/login?error=google_failed',
     });
   };
 
@@ -63,5 +70,19 @@ export default function LoginForm() {
         <Form.GoogleButton onGoogleSignIn={handleGoogleSignIn} />
       </Form.Root>
     </AuthLayout>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      }
+    >
+      <LoginFormContent />
+    </Suspense>
   );
 }
